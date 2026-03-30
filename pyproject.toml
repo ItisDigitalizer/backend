@@ -1,0 +1,20 @@
+[project]
+name = "digitalizer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django>=6.0.3",
+    "pre-commit>=4.5.1",
+]
+
+[dependency-groups]
+dev = [
+    "cachetools>=7.0.5",
+    "django-stubs>=6.0.1",
+    "pydantic>=2.12.5",
+    "requests>=2.33.1",
+    "types-cachetools>=6.2.0.20260317",
+    "types-requests>=2.33.0.20260327",
+]
