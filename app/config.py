@@ -6,9 +6,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     UPLOAD_DIR: str = "uploads"
     TEMPLATES_DIR: str = "templates"
+    DATABASE_URL: str = "sqlite:///./digitalizer.db"
 
     class Config:
         env_file = ".env"
-
-
-settings = Settings()
