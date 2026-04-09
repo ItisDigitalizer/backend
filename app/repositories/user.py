@@ -9,7 +9,7 @@ from app.exceptions import NotFoundError
 import sqlalchemy
 
 
-class Repo:
+class UserRepo:
     def __init__(self, session_factory: Callable[[], Session]):
         self.session_factory = session_factory
 

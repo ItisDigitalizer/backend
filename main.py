@@ -1,21 +1,18 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Annotated
 
-from fastapi import APIRouter, Depends, FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.responses import JSONResponse
 from loguru import logger
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.exceptions import NotFoundError
 from app.models import User
-from app.repo import Repo
+from app.repositories.user import UserRepo
 from app.schemas.users import CreateUserRequest
-from app.service import Service
-from dependencies import get_service, get_settings
-from fastapi.responses import JSONResponse
-
-ServiceDep = Annotated[Service, Depends(get_service)]
+from app.services.user import UserService
+from dependencies import ServiceDep, get_settings
 
 
 @asynccontextmanager
@@ -26,8 +23,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
     SQLModel.metadata.create_all(engine)
     factory = sessionmaker(engine, expire_on_commit=False, class_=Session)
-    repo = Repo(session_factory=factory)
-    app.state.service = Service(repo)
+    repo = UserRepo(session_factory=factory)
+    app.state.service = UserService(repo)
     yield
     logger.info("App stopped")
 

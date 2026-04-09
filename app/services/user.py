@@ -1,9 +1,9 @@
 from app.models import User
-from app.repo import Repo
+from app.repositories.user import UserRepo
 
 
-class Service:
-    def __init__(self, repo: Repo):
+class UserService:
+    def __init__(self, repo: UserRepo):
         self.repo = repo
 
     def get_users(self) -> list[User]:
