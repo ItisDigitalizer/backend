@@ -5,22 +5,19 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import JSONResponse
 from loguru import logger
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel
 
 from app.exceptions import NotFoundError
 from app.models import User
 from app.repositories.user import UserRepo
 from app.schemas.users import CreateUserRequest
 from app.services.user import UserService
-from dependencies import ServiceDep, get_settings
+from dependencies import ServiceDep, engine
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("App started")
-    engine = create_engine(
-        get_settings().DATABASE_URL, connect_args={"check_same_thread": False}
-    )
     SQLModel.metadata.create_all(engine)
     factory = sessionmaker(engine, expire_on_commit=False, class_=Session)
     repo = UserRepo(session_factory=factory)
