@@ -1,0 +1,21 @@
+Generic single-database configuration.
+
+Migrations:
+
+    # 1. Change your models (add/remove fields, tables)
+
+    # 2. Generate migration
+    uv run alembic revision --autogenerate -m "short_description_of_changes"
+
+    # 3. Apply migration
+    uv run alembic upgrade head
+
+
+Example:
+    # Added age field to User model
+
+    # Generate migration
+    uv run alembic revision --autogenerate -m "add age to users"
+
+    # Apply migration
+    uv run alembic upgrade head
