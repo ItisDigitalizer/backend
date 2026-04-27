@@ -7,7 +7,7 @@ from app.models.base import BaseModel
 
 class UserRole(str, Enum):
     USER = ("user",)
-    MANAGER = ("manager",)
+    MANAGER = "manager"
 
 
 class User(BaseModel, table=True):  # type: ignore
