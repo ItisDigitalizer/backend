@@ -1,0 +1,348 @@
+openapi: 3.0.0
+info:
+  title: Digitalizer API
+  version: 1.0.0
+
+paths:
+  # ========== USERS ==========
+  /users:
+    get:
+      tags: [Users]
+      summary: Список пользователей
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+        - name: role
+          in: query
+          schema: { type: string, enum: [user, manager] }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/User' } }
+                  total: { type: integer }
+    post:
+      tags: [Users]
+      summary: Создать пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateUser' }
+      responses:
+        '201': { description: Created }
+        '400': { description: Email уже существует }
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '404': { description: Не найден }
+    patch:
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateUser' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+    delete:
+      tags: [Users]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: Удалено }
+
+  # ========== TEMPLATES ==========
+  /templates:
+    get:
+      tags: [Templates]
+      summary: Список шаблонов
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/Template' } }
+                  total: { type: integer }
+    post:
+      tags: [Templates]
+      summary: Создать шаблон (только менеджер)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTemplate' }
+      responses:
+        '201': { description: Created }
+        '403': { description: Нет прав }
+
+  /templates/{id}:
+    get:
+      tags: [Templates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Template' }
+        '404': { description: Не найден }
+    patch:
+      tags: [Templates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTemplate' }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Template' }
+    delete:
+      tags: [Templates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: Удалено }
+
+  # ========== TEMPLATE FIELDS ==========
+  /templates/{template_id}/fields:
+    get:
+      tags: [TemplateFields]
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TemplateField' }
+    post:
+      tags: [TemplateFields]
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTemplateField' }
+      responses:
+        '201': { description: Created }
+
+  /template-fields/{id}:
+    delete:
+      tags: [TemplateFields]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: Удалено }
+
+  # ========== GENERATION PROCESS ==========
+  /generation:
+    post:
+      tags: [Generation]
+      summary: Запустить генерацию
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateGenerationProcess' }
+      responses:
+        '202': { description: Принято в обработку }
+        '400': { description: Ошибка валидации }
+
+  /generation/{id}:
+    get:
+      tags: [Generation]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GenerationProcess' }
+        '404': { description: Не найден }
+
+  # ========== GENERATED DOCUMENTS ==========
+  /generation/{process_id}/documents:
+    get:
+      tags: [Generation]
+      summary: Список сгенерированных документов
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/GeneratedDocument' }
+
+components:
+  schemas:
+    # Error
+    Error:
+      type: object
+      properties:
+        detail: { type: string }
+
+    # User
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        username: { type: string }
+        email: { type: string }
+        role: { type: string, enum: [user, manager] }
+        created_at: { type: string, format: date-time }
+    CreateUser:
+      type: object
+      required: [username, email, password]
+      properties:
+        username: { type: string }
+        email: { type: string }
+        password: { type: string }
+        role: { type: string, enum: [user, manager], default: user }
+    UpdateUser:
+      type: object
+      properties:
+        username: { type: string }
+        email: { type: string }
+        password: { type: string }
+        role: { type: string, enum: [user, manager] }
+
+    # Template
+    Template:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        file_path: { type: string }
+        user_id: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CreateTemplate:
+      type: object
+      required: [name, file_path]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        file_path: { type: string }
+    UpdateTemplate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        file_path: { type: string }
+
+    # TemplateField
+    TemplateField:
+      type: object
+      properties:
+        id: { type: integer }
+        template_id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        created_at: { type: string, format: date-time }
+    CreateTemplateField:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string }
+
+    # GenerationProcess
+    GenerationProcess:
+      type: object
+      properties:
+        id: { type: integer }
+        user_id: { type: integer, nullable: true }
+        template_id: { type: integer }
+        status: { type: string, enum: [pending, processing, completed, failed] }
+        input_type: { type: string, enum: [form, excel] }
+        created_at: { type: string, format: date-time }
+    CreateGenerationProcess:
+      type: object
+      required: [template_id, input_type, data]
+      properties:
+        template_id: { type: integer }
+        input_type: { type: string, enum: [form, excel] }
+        data: { type: object, additionalProperties: true }
+
+    # GeneratedDocument
+    GeneratedDocument:
+      type: object
+      properties:
+        id: { type: integer }
+        gen_process_id: { type: integer }
+        file_path: { type: string }
+        created_at: { type: string, format: date-time }
