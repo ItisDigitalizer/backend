@@ -38,3 +38,7 @@ class BaseService(Generic[RepositoryType]):
     async def update(self, pk: UUID, updates: BaseModel) -> Optional[ModelType]:
         """Обновить запись"""
         return await self.repository.update(pk, updates)
+
+    async def get_all(self, offset: int = 0, limit: int = 100) -> Sequence[ModelType]:
+        """Получить все записи без фильтрации"""
+        return await self.repository.fetch(offset=offset, limit=limit)

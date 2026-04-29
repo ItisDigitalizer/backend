@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from loguru import logger
 
-from app.routers import users
+from app.routers import (
+    users,
+    generated_document,
+    generation_process,
+    document_template,
+    template_field,
+)
 from fastapi import APIRouter
 
 
@@ -22,8 +28,8 @@ app = FastAPI(
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(users.router)
-
-# router.include_router(templates.router)
-# router.include_router(documents.router)
-
+api_router.include_router(generated_document.router)
+api_router.include_router(generation_process.router)
+api_router.include_router(document_template.router)
+api_router.include_router(template_field.router)
 app.include_router(api_router)

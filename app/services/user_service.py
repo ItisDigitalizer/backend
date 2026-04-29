@@ -1,12 +1,13 @@
 # app/services/user_service.py
 from typing import Optional, Sequence
 from uuid import UUID
+
 from loguru import logger
 
+from app.models.user import User, UserCreate, UserUpdate
 from app.repositories.user_repo import UserRepository
+from app.schemas.user import UserFilters
 from app.services.base import BaseService
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate, UserFilters
 
 
 class UserService(BaseService[UserRepository]):

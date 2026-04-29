@@ -1,11 +1,12 @@
 # app/api/v1/endpoints/users.py
-from fastapi import APIRouter, HTTPException, status
+from typing import Any, List
 from uuid import UUID
-from typing import List, Any
 
-from app.models import UserRole
+from fastapi import APIRouter, HTTPException, status
+
 from app.dependencies import UserServiceDep
-from app.schemas.user import UserCreate, UserUpdate, UserResponse, UserFilters
+from app.models.user import UserCreate, UserRole, UserUpdate
+from app.schemas.user import UserFilters, UserResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
 
