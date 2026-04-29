@@ -1,8 +1,14 @@
 from enum import Enum
-from pydantic import EmailStr
+from typing import TYPE_CHECKING, List
 
-from sqlmodel import Field
+from pydantic import EmailStr
+from sqlmodel import Field, Relationship
+
 from app.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.document_template import DocumentTemplate
+    from app.models.generation_process import GenerationProcess
 
 
 class UserRole(str, Enum):
@@ -16,4 +22,21 @@ class User(BaseModel, table=True):  # type: ignore
     username: str = Field(unique=True, nullable=False)
     email: EmailStr = Field(nullable=False)
     password: str
-    role: UserRole = Field(nullable=False, default_factory=UserRole.USER)
+    role: UserRole = Field(nullable=False, default=UserRole.USER)
+
+    templates: List["DocumentTemplate"] = Relationship(back_populates="user")
+    processes: List["GenerationProcess"] = Relationship(back_populates="user")
+
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    role: UserRole = UserRole.USER
+
+
+class UserUpdate(BaseModel):
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    role: UserRole | None = None
