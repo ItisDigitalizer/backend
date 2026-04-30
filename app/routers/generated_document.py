@@ -80,7 +80,7 @@ async def delete_document(document_id: UUID, service: GeneratedDocumentServiceDe
     return None
 
 
-@router.delete("/by-process/{gen_process_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{gen_process_id}/documents", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_documents_by_process(
     gen_process_id: UUID, service: GeneratedDocumentServiceDep
 ):

@@ -11,7 +11,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.session import get_session
 from app.models.base import BaseModel
 
-# Создаем TypeVar для Generic
 ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
