@@ -5,13 +5,13 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRole, UserUpdate
-from app.schemas.user import UserFilters, UserResponse
+from app.models.user import UserCreate, UserRole, UserUpdate, UserRead
+from app.schemas.user import UserFilters
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreate, service: UserServiceDep):
     """Создание нового пользователя"""
     try:
@@ -21,7 +21,7 @@ async def create_user(user_data: UserCreate, service: UserServiceDep):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/", response_model=List[UserRead])
 async def get_users(
     service: UserServiceDep,
     skip: int = 0,
@@ -36,7 +36,7 @@ async def get_users(
     return users
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserRead)
 async def get_current_user(
     # Здесь будет current_user после реализации аутентификации
     service: UserServiceDep,
@@ -46,7 +46,7 @@ async def get_current_user(
     pass
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserRead)
 async def get_user(user_id: UUID, service: UserServiceDep) -> Any:
     """Получение пользователя по ID"""
     user = await service.get(user_id)  # type: ignore
@@ -57,7 +57,7 @@ async def get_user(user_id: UUID, service: UserServiceDep) -> Any:
     return user
 
 
-@router.patch("/{user_id}", response_model=UserResponse)
+@router.patch("/{user_id}", response_model=UserRead)
 async def update_user(user_id: UUID, updates: UserUpdate, service: UserServiceDep):
     """Обновление пользователя"""
     try:

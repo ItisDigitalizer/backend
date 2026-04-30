@@ -1,11 +1,11 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.document_template import DocumentTemplate
 from app.repositories.base import Repository
+from app.schemas.document_template import DocumentTemplateFilters
 
 
 class DocumentTemplateRepository(Repository[DocumentTemplate]):
@@ -15,11 +15,15 @@ class DocumentTemplateRepository(Repository[DocumentTemplate]):
         super().__init__(session)
 
     async def get_by_user_id(self, user_id: UUID) -> Sequence[DocumentTemplate]:
-        statement = select(self.model).where(self.model.user_id == user_id)
-        result = await self._session.exec(statement)
-        return result.all()
+        filters = DocumentTemplateFilters(user_id=user_id)
+        return await self.fetch(filters)
 
     async def get_by_name(self, name: str) -> Optional[DocumentTemplate]:
-        statement = select(self.model).where(self.model.name == name)
-        result = await self._session.exec(statement)
-        return result.first()
+        filters = DocumentTemplateFilters(name=name)
+        result = await self.fetch(filters)
+        return result[0] if result else None
+
+    async def fetch_with_filters(
+        self, filters: DocumentTemplateFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[DocumentTemplate]:
+        return await self.fetch(filters, offset, limit)

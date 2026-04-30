@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Any, List
 from uuid import UUID
-from typing import List, Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import DocumentTemplateServiceDep
 from app.models.document_template import (
     DocumentTemplateCreate,
-    DocumentTemplateUpdate,
     DocumentTemplateRead,
+    DocumentTemplateUpdate,
 )
+from app.schemas.document_template import DocumentTemplateFilters
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -35,14 +37,8 @@ async def get_templates(
     name: str | None = None,
 ) -> Any:
     """Получение списка шаблонов с фильтрацией"""
-    if user_id:
-        templates = await service.get_by_user_id(user_id)
-        return templates[skip : skip + limit]
-    if name:
-        template = await service.get_by_name(name)
-        return [template] if template else []
-
-    return await service.get_all(skip, limit)
+    filters = DocumentTemplateFilters(user_id=user_id, name=name)
+    return await service.get_filtered_templates(filters, skip, limit)
 
 
 @router.get("/{template_id}", response_model=DocumentTemplateRead)

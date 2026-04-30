@@ -10,6 +10,7 @@ from app.models.generated_document import (
     GeneratedDocumentCreate,
     GeneratedDocumentUpdate,
 )
+from app.schemas.generated_document import GeneratedDocumentFilters
 
 
 class GeneratedDocumentService(BaseService[GeneratedDocumentRepository]):
@@ -42,3 +43,8 @@ class GeneratedDocumentService(BaseService[GeneratedDocumentRepository]):
 
     async def delete_by_process_id(self, gen_process_id: UUID) -> int:
         return await self.repository.delete_by_process_id(gen_process_id)
+
+    async def get_filtered_document(
+        self, filters: GeneratedDocumentFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[GeneratedDocument]:
+        return await self.repository.fetch_with_filters(filters, offset, limit)

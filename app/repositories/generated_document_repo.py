@@ -1,11 +1,11 @@
 import uuid
 from typing import Sequence
 
-from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.generated_document import GeneratedDocument
 from app.repositories.base import Repository
+from app.schemas.generated_document import GeneratedDocumentFilters
 
 
 class GeneratedDocumentRepository(Repository[GeneratedDocument]):
@@ -15,16 +15,19 @@ class GeneratedDocumentRepository(Repository[GeneratedDocument]):
         super().__init__(session)
 
     async def get_by_process_id(
-        self, gen_process_id: uuid.UUID
+        self, gen_process_id: uuid.UUID, offset: int = 0, limit: int = 100
     ) -> Sequence[GeneratedDocument]:
-        statement = select(self.model).where(
-            self.model.gen_process_id == gen_process_id
-        )
-        result = await self._session.exec(statement)
-        return result.all()
+        filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
+        return await self.fetch(filters, offset, limit)
 
     async def delete_by_process_id(self, gen_process_id: uuid.UUID) -> int:
-        documents = await self.get_by_process_id(gen_process_id)
+        filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
+        documents = await self.fetch(filters)
         for doc in documents:
             await self.delete(doc.id)
         return len(documents)
+
+    async def fetch_with_filters(
+        self, filters: GeneratedDocumentFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[GeneratedDocument]:
+        return await self.fetch(filters, offset, limit)

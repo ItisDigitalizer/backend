@@ -3,13 +3,14 @@ from uuid import UUID
 
 from loguru import logger
 
-from app.repositories.generation_process_repo import GenerationProcessRepository
-from app.services.base import BaseService
 from app.models.generation_process import (
     GenerationProcess,
     GenerationProcessCreate,
     GenerationProcessUpdate,
 )
+from app.repositories.generation_process_repo import GenerationProcessRepository
+from app.schemas.generation_process import GenerationProcessFilters
+from app.services.base import BaseService
 
 
 class GenerationProcessService(BaseService[GenerationProcessRepository]):
@@ -38,3 +39,8 @@ class GenerationProcessService(BaseService[GenerationProcessRepository]):
 
     async def delete_process(self, process_id: UUID) -> Optional[GenerationProcess]:
         return await self.repository.delete(process_id)
+
+    async def get_filtered_process(
+        self, filters: GenerationProcessFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[GenerationProcess]:
+        return await self.repository.fetch_with_filters(filters, offset, limit)

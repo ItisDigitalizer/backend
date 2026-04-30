@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Any, List
 from uuid import UUID
-from typing import List, Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import GenerationProcessServiceDep
 from app.models.generation_process import (
     GenerationProcessCreate,
-    GenerationProcessUpdate,
     GenerationProcessRead,
+    GenerationProcessUpdate,
 )
+from app.schemas.generation_process import GenerationProcessFilters
 
 router = APIRouter(prefix="/processes", tags=["processes"])
 
@@ -35,14 +37,8 @@ async def get_processes(
     template_id: UUID | None = None,
 ) -> Any:
     """Получение списка процессов с фильтрацией"""
-    if user_id:
-        processes = await service.get_by_user_id(user_id)
-        return processes[skip : skip + limit]
-    if template_id:
-        processes = await service.get_by_template_id(template_id)
-        return processes[skip : skip + limit]
-
-    return await service.get_all(skip, limit)
+    filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
+    return await service.get_filtered_process(filters, skip, limit)
 
 
 @router.get("/{process_id}", response_model=GenerationProcessRead)

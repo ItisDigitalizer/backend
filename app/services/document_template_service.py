@@ -10,6 +10,7 @@ from app.models.document_template import (
     DocumentTemplateCreate,
     DocumentTemplateUpdate,
 )
+from app.schemas.document_template import DocumentTemplateFilters
 
 
 class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
@@ -39,3 +40,8 @@ class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
 
     async def delete_template(self, template_id: UUID) -> Optional[DocumentTemplate]:
         return await self.repository.delete(template_id)
+
+    async def get_filtered_templates(
+        self, filters: DocumentTemplateFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[DocumentTemplate]:
+        return await self.repository.fetch_with_filters(filters, offset, limit)

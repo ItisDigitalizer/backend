@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Any, List
 from uuid import UUID
-from typing import List, Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import TemplateFieldServiceDep
 from app.models.template_field import (
     TemplateFieldCreate,
-    TemplateFieldUpdate,
     TemplateFieldRead,
+    TemplateFieldUpdate,
 )
+from app.schemas.template_field import TemplateFieldFilters
 
 router = APIRouter(prefix="/fields", tags=["fields"])
 
@@ -30,11 +32,8 @@ async def get_fields(
     template_id: UUID | None = None,
 ) -> Any:
     """Получение списка полей с фильтрацией по шаблону"""
-    if template_id:
-        fields = await service.get_by_template_id(template_id)
-        return fields[skip : skip + limit]
-
-    return await service.get_all(skip, limit)
+    filters = TemplateFieldFilters(template_id=template_id)
+    return await service.get_filtered_field(filters, skip, limit)
 
 
 @router.get("/{field_id}", response_model=TemplateFieldRead)

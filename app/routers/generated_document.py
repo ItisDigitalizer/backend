@@ -1,13 +1,15 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Any, List
 from uuid import UUID
-from typing import List, Any
+
+from fastapi import APIRouter, HTTPException, status
 
 from app.dependencies import GeneratedDocumentServiceDep
 from app.models.generated_document import (
     GeneratedDocumentCreate,
-    GeneratedDocumentUpdate,
     GeneratedDocumentRead,
+    GeneratedDocumentUpdate,
 )
+from app.schemas.generated_document import GeneratedDocumentFilters
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -34,12 +36,8 @@ async def get_documents(
     gen_process_id: UUID | None = None,
 ) -> Any:
     """Получение списка документов с фильтрацией по процессу"""
-    if gen_process_id:
-        documents = await service.get_by_process_id(gen_process_id)
-        return documents[skip : skip + limit]
-
-    documents = await service.get_all(skip, limit)
-    return documents
+    filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
+    return await service.get_filtered_document(filters, skip, limit)
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)

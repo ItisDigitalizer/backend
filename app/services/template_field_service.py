@@ -3,13 +3,14 @@ from uuid import UUID
 
 from loguru import logger
 
-from app.repositories.template_field_repo import TemplateFieldRepository
-from app.services.base import BaseService
 from app.models.template_field import (
     TemplateField,
     TemplateFieldCreate,
     TemplateFieldUpdate,
 )
+from app.repositories.template_field_repo import TemplateFieldRepository
+from app.schemas.template_field import TemplateFieldFilters
+from app.services.base import BaseService
 
 
 class TemplateFieldService(BaseService[TemplateFieldRepository]):
@@ -33,3 +34,8 @@ class TemplateFieldService(BaseService[TemplateFieldRepository]):
 
     async def delete_field(self, field_id: UUID) -> Optional[TemplateField]:
         return await self.repository.delete(field_id)
+
+    async def get_filtered_field(
+        self, filters: TemplateFieldFilters, offset: int = 0, limit: int = 100
+    ) -> Sequence[TemplateField]:
+        return await self.repository.fetch_with_filters(filters, offset, limit)
