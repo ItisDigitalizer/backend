@@ -1,6 +1,7 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
+from fastapi.params import Depends
 from loguru import logger
 
 from app.models.template_field import (
@@ -14,7 +15,9 @@ from app.services.base import BaseService
 
 
 class TemplateFieldService(BaseService[TemplateFieldRepository]):
-    def __init__(self, repository: TemplateFieldRepository):
+    def __init__(
+        self, repository: TemplateFieldRepository = Depends(TemplateFieldRepository)
+    ):
         super().__init__(repository)
 
     async def create_field(self, data: TemplateFieldCreate) -> TemplateField:

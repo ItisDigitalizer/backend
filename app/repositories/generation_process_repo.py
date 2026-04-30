@@ -1,8 +1,6 @@
 from typing import Sequence
 from uuid import UUID
 
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from app.models.generation_process import GenerationProcess
 from app.repositories.base import Repository
 from app.schemas.generation_process import GenerationProcessFilters
@@ -10,9 +8,6 @@ from app.schemas.generation_process import GenerationProcessFilters
 
 class GenerationProcessRepository(Repository[GenerationProcess]):
     model = GenerationProcess
-
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
 
     async def get_by_user_id(self, user_id: UUID) -> Sequence[GenerationProcess]:
         filters = GenerationProcessFilters(user_id=user_id)

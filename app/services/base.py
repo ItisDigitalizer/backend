@@ -1,22 +1,17 @@
 # app/services/base.py
-from typing import Generic, TypeVar, Optional, Sequence
+from typing import Generic, Optional, Sequence, TypeVar
 from uuid import UUID
+
 from pydantic import BaseModel
 
 from app.repositories.base import Repository
 
-# Тип для модели (любая модель SQLModel)
 ModelType = TypeVar("ModelType")
-# Тип для репозитория
+
 RepositoryType = TypeVar("RepositoryType", bound=Repository)
 
 
 class BaseService(Generic[RepositoryType]):
-    """
-    Базовый сервис с общими CRUD методами.
-    Все конкретные сервисы наследуются от него.
-    """
-
     def __init__(self, repository: RepositoryType):
         self.repository = repository
 

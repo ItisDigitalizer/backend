@@ -1,11 +1,14 @@
 # app/repositories/base.py
-from typing import Optional, Sequence, Generic, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar
 from uuid import UUID
+
+from fastapi.params import Depends
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy import and_
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.db.session import get_session
 from app.models.base import BaseModel
 
 # Создаем TypeVar для Generic
@@ -13,11 +16,9 @@ ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
 class Repository(Generic[ModelType]):
-    """Базовый репозиторий с CRUD операциями"""
+    model: type[ModelType]
 
-    model: type[ModelType]  # Теперь это атрибут класса, который нужно переопределить
-
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession = Depends(get_session)):
         self._session = session
 
     async def get(self, pk: UUID) -> Optional[ModelType]:

@@ -1,20 +1,24 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
+from fastapi.params import Depends
 from loguru import logger
 
-from app.repositories.document_template_repo import DocumentTemplateRepository
-from app.services.base import BaseService
 from app.models.document_template import (
     DocumentTemplate,
     DocumentTemplateCreate,
     DocumentTemplateUpdate,
 )
+from app.repositories.document_template_repo import DocumentTemplateRepository
 from app.schemas.document_template import DocumentTemplateFilters
+from app.services.base import BaseService
 
 
 class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
-    def __init__(self, repository: DocumentTemplateRepository):
+    def __init__(
+        self,
+        repository: DocumentTemplateRepository = Depends(DocumentTemplateRepository),
+    ):
         super().__init__(repository)
 
     async def create_template(self, data: DocumentTemplateCreate) -> DocumentTemplate:

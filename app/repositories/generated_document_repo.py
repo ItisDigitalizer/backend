@@ -1,8 +1,6 @@
 import uuid
 from typing import Sequence
 
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from app.models.generated_document import GeneratedDocument
 from app.repositories.base import Repository
 from app.schemas.generated_document import GeneratedDocumentFilters
@@ -10,9 +8,6 @@ from app.schemas.generated_document import GeneratedDocumentFilters
 
 class GeneratedDocumentRepository(Repository[GeneratedDocument]):
     model = GeneratedDocument
-
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
 
     async def get_by_process_id(
         self, gen_process_id: uuid.UUID, offset: int = 0, limit: int = 100

@@ -1,20 +1,24 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
+from fastapi.params import Depends
 from loguru import logger
 
-from app.repositories.generated_document_repo import GeneratedDocumentRepository
-from app.services.base import BaseService
 from app.models.generated_document import (
     GeneratedDocument,
     GeneratedDocumentCreate,
     GeneratedDocumentUpdate,
 )
+from app.repositories.generated_document_repo import GeneratedDocumentRepository
 from app.schemas.generated_document import GeneratedDocumentFilters
+from app.services.base import BaseService
 
 
 class GeneratedDocumentService(BaseService[GeneratedDocumentRepository]):
-    def __init__(self, repository: GeneratedDocumentRepository):
+    def __init__(
+        self,
+        repository: GeneratedDocumentRepository = Depends(GeneratedDocumentRepository),
+    ):
         super().__init__(repository)
 
     async def create_document(

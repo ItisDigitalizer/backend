@@ -1,7 +1,6 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.document_template import DocumentTemplate
 from app.repositories.base import Repository
@@ -10,9 +9,6 @@ from app.schemas.document_template import DocumentTemplateFilters
 
 class DocumentTemplateRepository(Repository[DocumentTemplate]):
     model = DocumentTemplate
-
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
 
     async def get_by_user_id(self, user_id: UUID) -> Sequence[DocumentTemplate]:
         filters = DocumentTemplateFilters(user_id=user_id)

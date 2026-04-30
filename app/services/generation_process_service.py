@@ -1,6 +1,7 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
+from fastapi.params import Depends
 from loguru import logger
 
 from app.models.generation_process import (
@@ -14,7 +15,10 @@ from app.services.base import BaseService
 
 
 class GenerationProcessService(BaseService[GenerationProcessRepository]):
-    def __init__(self, repository: GenerationProcessRepository):
+    def __init__(
+        self,
+        repository: GenerationProcessRepository = Depends(GenerationProcessRepository),
+    ):
         super().__init__(repository)
 
     async def create_process(self, data: GenerationProcessCreate) -> GenerationProcess:

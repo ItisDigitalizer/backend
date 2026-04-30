@@ -2,6 +2,7 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
+from fastapi.params import Depends
 from loguru import logger
 
 from app.models.user import User, UserCreate, UserUpdate
@@ -11,7 +12,7 @@ from app.services.base import BaseService
 
 
 class UserService(BaseService[UserRepository]):
-    def __init__(self, repository: UserRepository):
+    def __init__(self, repository: UserRepository = Depends(UserRepository)):
         super().__init__(repository)
 
     async def get_by_email(self, email: str) -> Optional[User]:

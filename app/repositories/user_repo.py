@@ -1,8 +1,6 @@
 # app/repositories/user_repo.py
 from typing import Optional, Sequence
 
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from app.models.user import User
 from app.repositories.base import Repository
 from app.schemas.user import UserFilters
@@ -10,9 +8,6 @@ from app.schemas.user import UserFilters
 
 class UserRepository(Repository[User]):
     model = User
-
-    def __init__(self, session: AsyncSession):
-        super().__init__(session)
 
     async def get_by_email(self, email: str) -> Optional[User]:
         filters = UserFilters(email=email)
