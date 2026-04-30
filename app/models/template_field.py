@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
@@ -20,21 +20,22 @@ class TemplateField(BaseModel, table=True):
     template: "DocumentTemplate" = Relationship(back_populates="fields")
 
 
-class TemplateFieldCreate(BaseModel):
+class TemplateFieldBase(SQLModel):
     template_id: uuid.UUID
     name: str
     description: str
 
 
-class TemplateFieldUpdate(BaseModel):
+class TemplateFieldCreate(TemplateFieldBase):
+    pass
+
+
+class TemplateFieldUpdate(SQLModel):
     name: str | None = None
     description: str | None = None
 
 
-class TemplateFieldRead(BaseModel):
+class TemplateFieldRead(TemplateFieldBase):
     id: uuid.UUID
-    template_id: uuid.UUID
-    name: str
-    description: str
     created_at: datetime
     updated_at: datetime

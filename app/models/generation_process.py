@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
@@ -23,19 +23,21 @@ class GenerationProcess(BaseModel, table=True):
     documents: List["GeneratedDocument"] = Relationship(back_populates="process")
 
 
-class GenerationProcessCreate(BaseModel):
+class GenerationProcessBase(SQLModel):
     user_id: uuid.UUID
     template_id: uuid.UUID
 
 
-class GenerationProcessUpdate(BaseModel):
+class GenerationProcessCreate(GenerationProcessBase):
+    pass
+
+
+class GenerationProcessUpdate(SQLModel):
     user_id: uuid.UUID | None = None
     template_id: uuid.UUID | None = None
 
 
-class GenerationProcessRead(BaseModel):
+class GenerationProcessRead(GenerationProcessBase):
     id: uuid.UUID
-    user_id: uuid.UUID
-    template_id: uuid.UUID
     created_at: datetime
     updated_at: datetime

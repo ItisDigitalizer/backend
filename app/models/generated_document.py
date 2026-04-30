@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
@@ -19,18 +19,20 @@ class GeneratedDocument(BaseModel, table=True):
     process: "GenerationProcess" = Relationship(back_populates="documents")
 
 
-class GeneratedDocumentCreate(BaseModel):
+class GeneratedDocumentBase(SQLModel):
     gen_process_id: uuid.UUID
     file_path: str
 
 
-class GeneratedDocumentUpdate(BaseModel):
+class GeneratedDocumentCreate(GeneratedDocumentBase):
+    pass
+
+
+class GeneratedDocumentUpdate(SQLModel):
     file_path: str | None = None
 
 
-class GeneratedDocumentRead(BaseModel):
+class GeneratedDocumentRead(GeneratedDocumentBase):
     id: uuid.UUID
-    gen_process_id: uuid.UUID
-    file_path: str
     created_at: datetime
     updated_at: datetime
