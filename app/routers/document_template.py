@@ -2,6 +2,7 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
 
 from app.dependencies import DocumentTemplateServiceDep
 from app.models.document_template import (
@@ -10,6 +11,7 @@ from app.models.document_template import (
     DocumentTemplateUpdate,
 )
 from app.schemas.document_template import DocumentTemplateFilters
+from app.schemas.pagination import PaginationParam
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -31,14 +33,15 @@ async def create_template(
 @router.get("/", response_model=List[DocumentTemplateRead])
 async def get_templates(
     service: DocumentTemplateServiceDep,
-    skip: int = 0,
-    limit: int = 100,
+    pagination: PaginationParam = Depends(),
     user_id: UUID | None = None,
     name: str | None = None,
 ) -> Any:
     """Получение списка шаблонов с фильтрацией"""
     filters = DocumentTemplateFilters(user_id=user_id, name=name)
-    return await service.get_filtered_templates(filters, skip, limit)
+    return await service.get_filtered_templates(
+        filters, pagination.skip, pagination.limit
+    )
 
 
 @router.get("/{template_id}", response_model=DocumentTemplateRead)

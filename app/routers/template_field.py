@@ -2,6 +2,7 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
 
 from app.dependencies import TemplateFieldServiceDep
 from app.models.template_field import (
@@ -9,6 +10,7 @@ from app.models.template_field import (
     TemplateFieldRead,
     TemplateFieldUpdate,
 )
+from app.schemas.pagination import PaginationParam
 from app.schemas.template_field import TemplateFieldFilters
 
 router = APIRouter(prefix="/fields", tags=["fields"])
@@ -27,13 +29,12 @@ async def create_field(data: TemplateFieldCreate, service: TemplateFieldServiceD
 @router.get("/", response_model=List[TemplateFieldRead])
 async def get_fields(
     service: TemplateFieldServiceDep,
-    skip: int = 0,
-    limit: int = 100,
+    pagination: PaginationParam = Depends(),
     template_id: UUID | None = None,
 ) -> Any:
     """Получение списка полей с фильтрацией по шаблону"""
     filters = TemplateFieldFilters(template_id=template_id)
-    return await service.get_filtered_field(filters, skip, limit)
+    return await service.get_filtered_field(filters, pagination.skip, pagination.limit)
 
 
 @router.get("/{field_id}", response_model=TemplateFieldRead)

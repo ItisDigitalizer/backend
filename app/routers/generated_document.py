@@ -2,6 +2,7 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
 
 from app.dependencies import GeneratedDocumentServiceDep
 from app.models.generated_document import (
@@ -10,6 +11,7 @@ from app.models.generated_document import (
     GeneratedDocumentUpdate,
 )
 from app.schemas.generated_document import GeneratedDocumentFilters
+from app.schemas.pagination import PaginationParam
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -31,13 +33,14 @@ async def create_document(
 @router.get("/", response_model=List[GeneratedDocumentRead])
 async def get_documents(
     service: GeneratedDocumentServiceDep,
-    skip: int = 0,
-    limit: int = 100,
+    pagination: PaginationParam = Depends(),
     gen_process_id: UUID | None = None,
 ) -> Any:
     """Получение списка документов с фильтрацией по процессу"""
     filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
-    return await service.get_filtered_document(filters, skip, limit)
+    return await service.get_filtered_document(
+        filters, pagination.skip, pagination.limit
+    )
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)

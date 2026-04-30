@@ -3,9 +3,11 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
 
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRole, UserUpdate, UserRead
+from app.models.user import UserCreate, UserRead, UserRole, UserUpdate
+from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -24,15 +26,14 @@ async def create_user(user_data: UserCreate, service: UserServiceDep):
 @router.get("/", response_model=List[UserRead])
 async def get_users(
     service: UserServiceDep,
-    skip: int = 0,
-    limit: int = 100,
+    pagination: PaginationParam = Depends(),
     username: str | None = None,
     email: str | None = None,
     role: UserRole | None = UserRole.USER,
 ) -> Any:
     """Получение списка пользователей с фильтрацией"""
     filters = UserFilters(username=username, email=email, role=role)
-    users = await service.get_filtered_users(filters, skip, limit)
+    users = await service.get_filtered_users(filters, pagination.skip, pagination.limit)
     return users
 
 

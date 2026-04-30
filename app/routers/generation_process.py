@@ -2,6 +2,7 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.params import Depends
 
 from app.dependencies import GenerationProcessServiceDep
 from app.models.generation_process import (
@@ -10,6 +11,7 @@ from app.models.generation_process import (
     GenerationProcessUpdate,
 )
 from app.schemas.generation_process import GenerationProcessFilters
+from app.schemas.pagination import PaginationParam
 
 router = APIRouter(prefix="/processes", tags=["processes"])
 
@@ -31,14 +33,15 @@ async def create_process(
 @router.get("/", response_model=List[GenerationProcessRead])
 async def get_processes(
     service: GenerationProcessServiceDep,
-    skip: int = 0,
-    limit: int = 100,
+    pagination: PaginationParam = Depends(),
     user_id: UUID | None = None,
     template_id: UUID | None = None,
 ) -> Any:
     """Получение списка процессов с фильтрацией"""
     filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
-    return await service.get_filtered_process(filters, skip, limit)
+    return await service.get_filtered_process(
+        filters, pagination.skip, pagination.limit
+    )
 
 
 @router.get("/{process_id}", response_model=GenerationProcessRead)
