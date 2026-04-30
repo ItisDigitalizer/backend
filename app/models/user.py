@@ -48,7 +48,7 @@ class UserUpdate(SQLModel):
     role: UserRole | None = None
 
 
-class UserResponse(UserBase):
+class UserRead(UserBase):
     id: uuid.UUID
     created_at: datetime
     updated_at: datetime
