@@ -38,7 +38,9 @@ class UserBase(SQLModel):
 
 
 class UserCreate(UserBase):
-    pass
+    username: str
+    email: str
+    password: str
 
 
 class UserUpdate(SQLModel):

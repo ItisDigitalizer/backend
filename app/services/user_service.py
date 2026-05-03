@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi.params import Depends
 from loguru import logger
 
+from app.auth.utils import hash_password
 from app.models.user import User, UserCreate, UserUpdate
 from app.repositories.user_repo import UserRepository
 from app.schemas.user import UserFilters
@@ -36,7 +37,7 @@ class UserService(BaseService[UserRepository]):
             raise ValueError(f"User with username {user_data.username} already exists")
 
         # Здесь должен быть хеширование пароля
-        # user_data.password_hash = hash_password(user_data.password_hash)
+        user_data.password_hash = hash_password(user_data.password_hash)
 
         logger.info(f"Creating user: {user_data.username}")
         return await self.create(user_data)
