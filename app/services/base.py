@@ -1,22 +1,17 @@
 # app/services/base.py
-from typing import Generic, TypeVar, Optional, Sequence
+from typing import Generic, Optional, Sequence, TypeVar
 from uuid import UUID
+
 from pydantic import BaseModel
 
 from app.repositories.base import Repository
 
-# Тип для модели (любая модель SQLModel)
 ModelType = TypeVar("ModelType")
-# Тип для репозитория
+
 RepositoryType = TypeVar("RepositoryType", bound=Repository)
 
 
 class BaseService(Generic[RepositoryType]):
-    """
-    Базовый сервис с общими CRUD методами.
-    Все конкретные сервисы наследуются от него.
-    """
-
     def __init__(self, repository: RepositoryType):
         self.repository = repository
 
@@ -38,3 +33,7 @@ class BaseService(Generic[RepositoryType]):
     async def update(self, pk: UUID, updates: BaseModel) -> Optional[ModelType]:
         """Обновить запись"""
         return await self.repository.update(pk, updates)
+
+    async def get_all(self, offset: int = 0, limit: int = 100) -> Sequence[ModelType]:
+        """Получить все записи без фильтрации"""
+        return await self.repository.fetch(offset=offset, limit=limit)

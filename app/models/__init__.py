@@ -1,6 +1,8 @@
 from .user import User, UserRole
-from .template import DocumentTemplate, TemplateField
-from .document import GenerationProcess, GeneratedDocument
+from .document_template import DocumentTemplate
+from .generation_process import GenerationProcess
+from .generated_document import GeneratedDocument
+from .template_field import TemplateField
 
 __all__ = [
     "User",

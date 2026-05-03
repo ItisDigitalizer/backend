@@ -1,33 +1,64 @@
 # Digitalizer
 
-Сервис для генерации документов на основе шаблонов. Пользователь выбирает шаблон, вводит данные (вручную или через Excel), система подставляет значения и возвращает готовый документ (или ZIP-архив при массовой генерации).
+Сервис для генерации документов из шаблонов.
 
----
+|     Роль     |             Участник              |
+|--------------|-----------------------------------|
+| **Backend**  | Валиуллин Азат, Минахметов Камиль |
+| **Frontend** | Юнусов Артем                      |
 
-## Команда и роли
-
-| Роль | Участник |
-|------|----------|
-| **Backend** | Валиуллин Азат, Минахметов Камиль |
-| **Frontend** | Юнусов Артем |
-
----
-
-## Технологии
+## 🛠 Стек
 
 - **FastAPI** — веб-фреймворк
-- **SQLModel** — ORM + валидация
-- **SQLite** — база данных (в продакшене PostgreSQL)
+- **SQLModel** + **SQLAlchemy 2.0** — ORM и модели
+- **PostgreSQL** — база данных
 - **Alembic** — миграции
-- **Jinja2** — шаблоны документов
-- **python-docx / openpyxl** — работа с Word/Excel
+- **Pydantic v2** — валидация данных
+- **Loguru** — логирование
 
----
-
-## Запуск проекта
-
-### 1. Клонировать репозиторий
+## 📦 Установка
 
 ```bash
-git clone <url-репозитория>
+# Клонируй репозиторий
+git clone https://github.com/ItisDigitalizer/backend.git
 cd backend
+
+# Установи uv (если ещё не)
+pip install uv
+
+# Создай виртуальное окружение и установи зависимости
+uv sync
+
+
+## ⚙️ Переменные окружения
+
+Создай файл `.env` в корне проекта:
+
+```env
+DATABASE_URL=...
+```
+
+## 🚀 Запуск
+
+```bash
+# Примени миграции
+alembic upgrade head
+
+# Запусти сервер
+uv run fastapi dev
+```
+
+Открой http://localhost:8000/docs — там Swagger UI со всеми эндпоинтами.
+
+
+## 📌 Модели и связи
+
+| Модель | Поля | Связи |
+|--------|------|-------|
+| **User** | username, email, password, role | → templates, processes |
+| **DocumentTemplate** | name, description, user_id, file_path | → user, fields, processes |
+| **TemplateField** | template_id, name, description | → template |
+| **GenerationProcess** | user_id, template_id | → user, template, documents |
+| **GeneratedDocument** | gen_process_id, file_path | → process |
+
+Все модели имеют `id` (UUID), `created_at`, `updated_at` (TIMESTAMP WITH TIME ZONE).

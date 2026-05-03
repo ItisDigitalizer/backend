@@ -9,6 +9,7 @@ import app.models
 from app.core.settings import Settings
 from app.repositories.user_repo import UserRepository
 from app.services.auth_service import AuthService
+from app.services.user_service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -30,7 +31,7 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(payload, Settings.secret_key, algorithm=Settings.algorithm)
 
 
-def get_current_user(
+async def get_current_user(
     token: str = Depends(oauth2_scheme),
     user_repo: UserRepository = Depends()
 ) -> app.models.User:
@@ -41,7 +42,7 @@ def get_current_user(
         if not user_id:
             raise HTTPException(401, "Invalid token")
 
-        user = user_repo.get_by_id(user_id)
+        user = await user_repo.get(user_id)
 
         if not user:
             raise HTTPException(401, "User not found")
@@ -55,7 +56,32 @@ def get_current_user(
         )
 
 
+def decode_token(token: str) -> dict:
+    try:
+        return jwt.decode(token, Settings.secret_key, algorithms=[Settings.algorithm])
+    except JWTError:
+        raise ValueError("Invalid token")
+
+
 def get_auth_service(
-    user_repo: UserRepository = Depends(UserRepository),
-) -> app.services.auth_service.AuthService:
-    return AuthService(user_repo=user_repo)
+    user_service: UserService = Depends(UserService),
+) -> AuthService:
+    return AuthService(user_service=user_service)
+
+
+def decode_refresh_token(token: str) -> dict:
+    payload = decode_token(token)
+
+    if payload.get("type") != "refresh":
+        raise ValueError("Invalid token type")
+
+    return payload
+
+
+def decode_access_token(token: str) -> dict:
+    payload = decode_token(token)
+
+    if payload.get("type") != "access":
+        raise ValueError("Invalid token type")
+
+    return payload

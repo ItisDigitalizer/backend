@@ -52,3 +52,17 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         "email": new_user.email,
         "role": new_user.role
     }
+
+
+@router.post("/change-password")
+async def change_password(
+    data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    await auth_service.change_password(
+        user_id=current_user.id,
+        old_password=data.old_password,
+        new_password=data.new_password,
+    )
+    return {"status": "ok"}
