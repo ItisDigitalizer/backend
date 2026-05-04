@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -36,7 +36,7 @@ async def get_templates(
     pagination: PaginationParam = Depends(),
     user_id: UUID | None = None,
     name: str | None = None,
-) -> Any:
+):
     """Получение списка шаблонов с фильтрацией"""
     filters = DocumentTemplateFilters(user_id=user_id, name=name)
     return await service.get_filtered_templates(

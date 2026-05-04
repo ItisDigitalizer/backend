@@ -1,5 +1,5 @@
 # app/api/v1/endpoints/users.py
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -30,7 +30,7 @@ async def get_users(
     username: str | None = None,
     email: str | None = None,
     role: UserRole | None = UserRole.USER,
-) -> Any:
+):
     """Получение списка пользователей с фильтрацией"""
     filters = UserFilters(username=username, email=email, role=role)
     users = await service.get_filtered_users(filters, pagination.skip, pagination.limit)
@@ -48,7 +48,7 @@ async def get_current_user(
 
 
 @router.get("/{user_id}", response_model=UserRead)
-async def get_user(user_id: UUID, service: UserServiceDep) -> Any:
+async def get_user(user_id: UUID, service: UserServiceDep):
     """Получение пользователя по ID"""
     user = await service.get(user_id)  # type: ignore
     if not user:

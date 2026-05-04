@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -36,7 +36,7 @@ async def get_processes(
     pagination: PaginationParam = Depends(),
     user_id: UUID | None = None,
     template_id: UUID | None = None,
-) -> Any:
+):
     """Получение списка процессов с фильтрацией"""
     filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
     return await service.get_filtered_process(
@@ -45,7 +45,7 @@ async def get_processes(
 
 
 @router.get("/{process_id}", response_model=GenerationProcessRead)
-async def get_process(process_id: UUID, service: GenerationProcessServiceDep) -> Any:
+async def get_process(process_id: UUID, service: GenerationProcessServiceDep):
     """Получение процесса по ID"""
     process = await service.get(process_id)  # type: ignore
     if not process:

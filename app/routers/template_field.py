@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -31,14 +31,14 @@ async def get_fields(
     service: TemplateFieldServiceDep,
     pagination: PaginationParam = Depends(),
     template_id: UUID | None = None,
-) -> Any:
+):
     """Получение списка полей с фильтрацией по шаблону"""
     filters = TemplateFieldFilters(template_id=template_id)
     return await service.get_filtered_field(filters, pagination.skip, pagination.limit)
 
 
 @router.get("/{field_id}", response_model=TemplateFieldRead)
-async def get_field(field_id: UUID, service: TemplateFieldServiceDep) -> Any:
+async def get_field(field_id: UUID, service: TemplateFieldServiceDep):
     """Получение поля по ID"""
     field = await service.get(field_id)  # type: ignore
     if not field:
