@@ -39,6 +39,6 @@ class TemplateFieldService(BaseService[TemplateFieldRepository]):
         return await self.repository.delete(field_id)
 
     async def get_filtered_field(
-        self, filters: TemplateFieldFilters, offset: int = 0, limit: int = 100
+        self, filters: TemplateFieldFilters, offset: int, limit: int
     ) -> Sequence[TemplateField]:
         return await self.repository.fetch_with_filters(filters, offset, limit)

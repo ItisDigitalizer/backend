@@ -46,6 +46,6 @@ class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
         return await self.repository.delete(template_id)
 
     async def get_filtered_templates(
-        self, filters: DocumentTemplateFilters, offset: int = 0, limit: int = 100
+        self, filters: DocumentTemplateFilters, offset: int, limit: int
     ) -> Sequence[DocumentTemplate]:
         return await self.repository.fetch_with_filters(filters, offset, limit)

@@ -20,6 +20,6 @@ class GenerationProcessRepository(Repository[GenerationProcess]):
         return await self.fetch(filters)
 
     async def fetch_with_filters(
-        self, filters: GenerationProcessFilters, offset: int = 0, limit: int = 100
+        self, filters: GenerationProcessFilters, offset: int, limit: int
     ) -> Sequence[GenerationProcess]:
         return await self.fetch(filters, offset, limit)

@@ -45,6 +45,6 @@ class GenerationProcessService(BaseService[GenerationProcessRepository]):
         return await self.repository.delete(process_id)
 
     async def get_filtered_process(
-        self, filters: GenerationProcessFilters, offset: int = 0, limit: int = 100
+        self, filters: GenerationProcessFilters, offset: int, limit: int
     ) -> Sequence[GenerationProcess]:
         return await self.repository.fetch_with_filters(filters, offset, limit)

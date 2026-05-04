@@ -64,7 +64,7 @@ class UserService(BaseService[UserRepository]):
         return user
 
     async def get_filtered_users(
-        self, filters: UserFilters, skip: int = 0, limit: int = 100
+        self, filters: UserFilters, skip: int, limit: int
     ) -> Sequence[User]:
         """Получение пользователей с фильтрацией"""
         return await self.repository.fetch_with_filters(filters, skip, limit)

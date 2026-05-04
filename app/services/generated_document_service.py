@@ -28,9 +28,9 @@ class GeneratedDocumentService(BaseService[GeneratedDocumentRepository]):
         return await self.create(document_data)
 
     async def get_by_process_id(
-        self, gen_process_id: UUID
+        self, gen_process_id: UUID, offset, skip
     ) -> Sequence[GeneratedDocument]:
-        return await self.repository.get_by_process_id(gen_process_id)
+        return await self.repository.get_by_process_id(gen_process_id, offset, skip)
 
     async def update_document(
         self, document_id: UUID, updates: GeneratedDocumentUpdate
@@ -49,6 +49,6 @@ class GeneratedDocumentService(BaseService[GeneratedDocumentRepository]):
         return await self.repository.delete_by_process_id(gen_process_id)
 
     async def get_filtered_document(
-        self, filters: GeneratedDocumentFilters, offset: int = 0, limit: int = 100
+        self, filters: GeneratedDocumentFilters, offset: int, limit: int
     ) -> Sequence[GeneratedDocument]:
         return await self.repository.fetch_with_filters(filters, offset, limit)

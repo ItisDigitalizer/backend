@@ -20,6 +20,6 @@ class UserRepository(Repository[User]):
         return result[0] if result else None
 
     async def fetch_with_filters(
-        self, filters: UserFilters, offset: int = 0, limit: int = 100
+        self, filters: UserFilters, offset: int, limit: int
     ) -> Sequence[User]:
         return await self.fetch(filters, offset, limit)

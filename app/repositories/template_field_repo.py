@@ -14,6 +14,6 @@ class TemplateFieldRepository(Repository[TemplateField]):
         return await self.fetch(filters)
 
     async def fetch_with_filters(
-        self, filters: TemplateFieldFilters, offset: int = 0, limit: int = 100
+        self, filters: TemplateFieldFilters, offset: int, limit: int
     ) -> Sequence[TemplateField]:
         return await self.fetch(filters, offset, limit)
