@@ -47,7 +47,7 @@ async def get_templates(
 @router.get("/{template_id}", response_model=DocumentTemplateRead)
 async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
     """Получение шаблона по ID"""
-    template = await service.get(template_id)  # type: ignore
+    template = await service.get(template_id)
     if not template:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"
