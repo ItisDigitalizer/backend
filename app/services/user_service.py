@@ -11,7 +11,7 @@ from app.schemas.user import UserFilters
 from app.services.base import BaseService
 
 
-class UserService(BaseService[UserRepository]):
+class UserService(BaseService[User, UserRepository]):
     def __init__(self, repository: UserRepository = Depends(UserRepository)):
         super().__init__(repository)
 
@@ -43,7 +43,7 @@ class UserService(BaseService[UserRepository]):
 
     async def update_user(self, user_id: UUID, updates: UserUpdate) -> Optional[User]:
         """Обновление пользователя с проверками"""
-        user = await self.get(user_id)  # type: ignore
+        user = await self.get(user_id)
         if not user:
             return None
 

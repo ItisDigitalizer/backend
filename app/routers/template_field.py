@@ -34,13 +34,15 @@ async def get_fields(
 ):
     """Получение списка полей с фильтрацией по шаблону"""
     filters = TemplateFieldFilters(template_id=template_id)
-    return await service.get_filtered_field(filters, pagination.skip, pagination.limit)
+    return await service.get_filtered_field(
+        filters, pagination.offset, pagination.limit
+    )
 
 
 @router.get("/{field_id}", response_model=TemplateFieldRead)
 async def get_field(field_id: UUID, service: TemplateFieldServiceDep):
     """Получение поля по ID"""
-    field = await service.get(field_id)  # type: ignore
+    field = await service.get(field_id)
     if not field:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Field not found"

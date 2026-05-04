@@ -14,7 +14,7 @@ from app.schemas.template_field import TemplateFieldFilters
 from app.services.base import BaseService
 
 
-class TemplateFieldService(BaseService[TemplateFieldRepository]):
+class TemplateFieldService(BaseService[TemplateField, TemplateFieldRepository]):
     def __init__(
         self, repository: TemplateFieldRepository = Depends(TemplateFieldRepository)
     ):
@@ -29,8 +29,8 @@ class TemplateFieldService(BaseService[TemplateFieldRepository]):
 
     async def update_field(
         self, field_id: UUID, updates: TemplateFieldUpdate
-    ) -> Optional[TemplateField]:
-        field = await self.get(field_id)  # type: ignore
+    ) -> TemplateField | None:
+        field = await self.get(field_id)
         if not field:
             return None
         return await self.update(field_id, updates)

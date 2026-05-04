@@ -14,7 +14,9 @@ from app.schemas.document_template import DocumentTemplateFilters
 from app.services.base import BaseService
 
 
-class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
+class DocumentTemplateService(
+    BaseService[DocumentTemplate, DocumentTemplateRepository]
+):
     def __init__(
         self,
         repository: DocumentTemplateRepository = Depends(DocumentTemplateRepository),
@@ -37,7 +39,7 @@ class DocumentTemplateService(BaseService[DocumentTemplateRepository]):
     async def update_template(
         self, template_id: UUID, updates: DocumentTemplateUpdate
     ) -> Optional[DocumentTemplate]:
-        template = await self.get(template_id)  # type: ignore
+        template = await self.get(template_id)
         if not template:
             return None
         return await self.update(template_id, updates)

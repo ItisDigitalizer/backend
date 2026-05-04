@@ -30,7 +30,9 @@ async def get_users(
     filters: UserFilters = Depends(),
 ):
     """Получение списка пользователей с фильтрацией"""
-    users = await service.get_filtered_users(filters, pagination.skip, pagination.limit)
+    users = await service.get_filtered_users(
+        filters, pagination.offset, pagination.limit
+    )
     return users
 
 
@@ -47,7 +49,7 @@ async def get_current_user(
 @router.get("/{user_id}", response_model=UserRead)
 async def get_user(user_id: UUID, service: UserServiceDep):
     """Получение пользователя по ID"""
-    user = await service.get(user_id)  # type: ignore
+    user = await service.get(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

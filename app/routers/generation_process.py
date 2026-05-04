@@ -40,14 +40,14 @@ async def get_processes(
     """Получение списка процессов с фильтрацией"""
     filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
     return await service.get_filtered_process(
-        filters, pagination.skip, pagination.limit
+        filters, pagination.offset, pagination.limit
     )
 
 
 @router.get("/{process_id}", response_model=GenerationProcessRead)
 async def get_process(process_id: UUID, service: GenerationProcessServiceDep):
     """Получение процесса по ID"""
-    process = await service.get(process_id)  # type: ignore
+    process = await service.get(process_id)
     if not process:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Process not found"
