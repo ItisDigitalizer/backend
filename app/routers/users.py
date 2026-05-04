@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserRole, UserUpdate
+from app.models.user import UserCreate, UserRead, UserUpdate
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
@@ -27,12 +27,9 @@ async def create_user(user_data: UserCreate, service: UserServiceDep):
 async def get_users(
     service: UserServiceDep,
     pagination: PaginationParam = Depends(),
-    username: str | None = None,
-    email: str | None = None,
-    role: UserRole | None = UserRole.USER,
+    filters: UserFilters = Depends(),
 ):
     """Получение списка пользователей с фильтрацией"""
-    filters = UserFilters(username=username, email=email, role=role)
     users = await service.get_filtered_users(filters, pagination.skip, pagination.limit)
     return users
 
