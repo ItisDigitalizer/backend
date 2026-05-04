@@ -42,7 +42,7 @@ DATABASE_URL=...
 
 ```bash
 # Примени миграции
-alembic upgrade head
+uv alembic upgrade head
 
 # Запусти сервер
 uv run fastapi dev
