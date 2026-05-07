@@ -20,6 +20,6 @@ class DocumentTemplateRepository(Repository[DocumentTemplate]):
         return result[0] if result else None
 
     async def fetch_with_filters(
-        self, filters: DocumentTemplateFilters, offset: int = 0, limit: int = 100
+        self, filters: DocumentTemplateFilters, offset: int, limit: int
     ) -> Sequence[DocumentTemplate]:
         return await self.fetch(filters, offset, limit)

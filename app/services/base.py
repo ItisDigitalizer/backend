@@ -2,28 +2,32 @@
 from typing import Generic, Optional, Sequence, TypeVar
 from uuid import UUID
 
+from fastapi.params import Depends
 from pydantic import BaseModel
 
 from app.repositories.base import Repository
+from app.schemas.pagination import PaginationParam
 
 ModelType = TypeVar("ModelType")
 
 RepositoryType = TypeVar("RepositoryType", bound=Repository)
 
 
-class BaseService(Generic[RepositoryType]):
+class BaseService(Generic[ModelType, RepositoryType]):
     def __init__(self, repository: RepositoryType):
         self.repository = repository
 
-    async def get(self, pk: UUID) -> Optional[ModelType]:
+    async def get(self, pk: UUID) -> ModelType | None:
         """Получить запись по ID"""
         return await self.repository.get(pk)
 
     async def fetch(
-        self, filters: Optional[BaseModel] = None, offset: int = 0, limit: int = 100
+        self,
+        filters: Optional[BaseModel] = None,
+        pagination: PaginationParam = Depends(),
     ) -> Sequence[ModelType]:
         """Получить список записей с фильтрацией"""
-        return await self.repository.fetch(filters, offset, limit)
+        return await self.repository.fetch(filters, pagination.offset, pagination.limit)
 
     async def create(self, data: BaseModel) -> ModelType:
         """Создать новую запись"""
@@ -34,6 +38,6 @@ class BaseService(Generic[RepositoryType]):
         """Обновить запись"""
         return await self.repository.update(pk, updates)
 
-    async def get_all(self, offset: int = 0, limit: int = 100) -> Sequence[ModelType]:
+    async def get_all(self, offset: int, limit: int) -> Sequence[ModelType]:
         """Получить все записи без фильтрации"""
         return await self.repository.fetch(offset=offset, limit=limit)

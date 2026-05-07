@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -36,18 +36,18 @@ async def get_templates(
     pagination: PaginationParam = Depends(),
     user_id: UUID | None = None,
     name: str | None = None,
-) -> Any:
+):
     """Получение списка шаблонов с фильтрацией"""
     filters = DocumentTemplateFilters(user_id=user_id, name=name)
     return await service.get_filtered_templates(
-        filters, pagination.skip, pagination.limit
+        filters, pagination.offset, pagination.limit
     )
 
 
 @router.get("/{template_id}", response_model=DocumentTemplateRead)
-async def get_template(template_id: UUID, service: DocumentTemplateServiceDep) -> Any:
+async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
     """Получение шаблона по ID"""
-    template = await service.get(template_id)  # type: ignore
+    template = await service.get(template_id)
     if not template:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"

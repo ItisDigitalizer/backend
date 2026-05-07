@@ -12,7 +12,7 @@ from app.schemas.user import UserFilters
 from app.services.base import BaseService
 
 
-class UserService(BaseService[UserRepository]):
+class UserService(BaseService[User, UserRepository]):
     def __init__(self, repository: UserRepository = Depends(UserRepository)):
         super().__init__(repository)
 
@@ -44,7 +44,7 @@ class UserService(BaseService[UserRepository]):
 
     async def update_user(self, user_id: UUID, updates: UserUpdate) -> Optional[User]:
         """Обновление пользователя с проверками"""
-        user = await self.get(user_id)  # type: ignore
+        user = await self.get(user_id)
         if not user:
             return None
 
@@ -65,7 +65,7 @@ class UserService(BaseService[UserRepository]):
         return user
 
     async def get_filtered_users(
-        self, filters: UserFilters, skip: int = 0, limit: int = 100
+        self, filters: UserFilters, skip: int, limit: int
     ) -> Sequence[User]:
         """Получение пользователей с фильтрацией"""
         return await self.repository.fetch_with_filters(filters, skip, limit)

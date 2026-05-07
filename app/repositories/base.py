@@ -1,5 +1,5 @@
 # app/repositories/base.py
-from typing import Generic, Optional, Sequence, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar, cast
 from uuid import UUID
 
 from fastapi.params import Depends
@@ -20,9 +20,10 @@ class Repository(Generic[ModelType]):
     def __init__(self, session: AsyncSession = Depends(get_session)):
         self._session = session
 
-    async def get(self, pk: UUID) -> Optional[ModelType]:
+    async def get(self, pk: UUID) -> ModelType | None:
         """Получение по ID"""
-        return await self._session.get(self.model, pk)
+        result = await self._session.get(self.model, pk)
+        return cast(Optional[ModelType], result)
 
     async def fetch(
         self,

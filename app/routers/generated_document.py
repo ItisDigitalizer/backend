@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -35,18 +35,18 @@ async def get_documents(
     service: GeneratedDocumentServiceDep,
     pagination: PaginationParam = Depends(),
     gen_process_id: UUID | None = None,
-) -> Any:
+):
     """Получение списка документов с фильтрацией по процессу"""
     filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
     return await service.get_filtered_document(
-        filters, pagination.skip, pagination.limit
+        filters, pagination.offset, pagination.limit
     )
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)
-async def get_document(document_id: UUID, service: GeneratedDocumentServiceDep) -> Any:
+async def get_document(document_id: UUID, service: GeneratedDocumentServiceDep):
     """Получение документа по ID"""
-    document = await service.get(document_id)  # type: ignore
+    document = await service.get(document_id)
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"

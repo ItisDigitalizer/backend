@@ -1,5 +1,3 @@
-import uuid
-from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, List
 
@@ -18,23 +16,18 @@ class UserRole(str, Enum):
     MANAGER = "manager"
 
 
-class User(BaseModel, table=True):  # type: ignore
-    __tablename__ = "users"
-
+class UserBase(SQLModel):
     username: str = Field(unique=True, nullable=False)
     email: EmailStr = Field(nullable=False)
-    password: str
+
     role: UserRole = Field(nullable=False, default=UserRole.USER)
 
+
+class User(BaseModel, UserBase, table=True):
+    __tablename__ = "users"
+    password: str
     templates: List["DocumentTemplate"] = Relationship(back_populates="user")
     processes: List["GenerationProcess"] = Relationship(back_populates="user")
-
-
-class UserBase(SQLModel):
-    username: str
-    email: EmailStr
-    password: str
-    role: UserRole = UserRole.USER
 
 
 class UserCreate(UserBase):
@@ -46,11 +39,8 @@ class UserCreate(UserBase):
 class UserUpdate(SQLModel):
     username: str | None = None
     email: EmailStr | None = None
-    password: str | None = None
     role: UserRole | None = None
 
 
-class UserRead(UserBase):
-    id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
+class UserRead(UserBase, BaseModel):
+    pass

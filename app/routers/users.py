@@ -1,5 +1,5 @@
 # app/api/v1/endpoints/users.py
-from typing import Any, List
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
@@ -8,7 +8,7 @@ from sqlalchemy.sql.functions import current_user
 
 from app.auth.utils import get_current_user
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserRole, UserUpdate, User
+from app.models.user import UserCreate, UserRead, UserUpdate, UserRole, User
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
@@ -29,15 +29,12 @@ async def create_user(user_data: UserCreate, service: UserServiceDep):
 async def get_users(
     service: UserServiceDep,
     pagination: PaginationParam = Depends(),
-    username: str | None = None,
-    email: str | None = None,
-    role: UserRole | None = UserRole.USER,
-) -> Any:
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(403, "Not enough permissions")
+    filters: UserFilters = Depends(),
+):
     """Получение списка пользователей с фильтрацией"""
-    filters = UserFilters(username=username, email=email, role=role)
-    users = await service.get_filtered_users(filters, pagination.skip, pagination.limit)
+    users = await service.get_filtered_users(
+        filters, pagination.offset, pagination.limit
+    )
     return users
 
 
@@ -49,9 +46,9 @@ async def get_current_user_route(
 
 
 @router.get("/{user_id}", response_model=UserRead)
-async def get_user(user_id: UUID, service: UserServiceDep) -> Any:
+async def get_user(user_id: UUID, service: UserServiceDep):
     """Получение пользователя по ID"""
-    user = await service.get(user_id)  # type: ignore
+    user = await service.get(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
