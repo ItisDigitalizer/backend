@@ -1,13 +1,26 @@
-# app/repositories/user_repo.py
+# app/repositories/auth_repo.py
 from typing import Optional, Sequence
 
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import get_session
 from app.models.user import User
 from app.repositories.base import Repository
-from app.schemas.user import UserFilters
+from app.schemas.authentication import UserFilters
 
 
-class UserRepository(Repository[User]):
+class AuthUserRepository(Repository[User]):
     model = User
+
+    async def create(self, username: str, password: str, email: str | None = None) -> User:
+        user = User(
+            username=username,
+            hashed_password=password,
+            email=email,
+            is_active=True,
+        )
+        return await self.save(user)
 
     async def get_by_email(self, email: str) -> Optional[User]:
         filters = UserFilters(email=email)

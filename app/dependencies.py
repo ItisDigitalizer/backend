@@ -4,6 +4,7 @@ from fastapi.params import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.db.session import get_session
+from app.services.auth_service import AuthService
 from app.services.document_template_service import DocumentTemplateService
 from app.services.generated_document_service import GeneratedDocumentService
 from app.services.generation_process_service import GenerationProcessService
@@ -28,3 +29,5 @@ DocumentTemplateServiceDep = Annotated[
 ]
 
 TemplateFieldServiceDep = Annotated[TemplateFieldService, Depends(TemplateFieldService)]
+
+AuthServiceDep = Annotated[AuthService, Depends(AuthService)]

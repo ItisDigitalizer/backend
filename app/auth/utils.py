@@ -8,6 +8,7 @@ from jose import jwt, JWTError
 
 import app.models
 from app.core.settings import Settings
+from app.repositories.auth_repo import AuthUserRepository
 from app.repositories.user_repo import UserRepository
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
@@ -56,7 +57,7 @@ async def get_current_user(
 
 
 async def get_auth_service(
-    user_service: UserService = Depends(UserService),
+    auth_user_repo: AuthUserRepository = Depends(AuthUserRepository),
 ) -> AuthService:
-    return AuthService(user_service=user_service)
+    return AuthService(auth_user_repo)
 

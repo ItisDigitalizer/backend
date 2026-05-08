@@ -17,15 +17,3 @@ def form_db_url() -> str:
 
 
 engine = create_async_engine(form_db_url(), echo=True)
-
-
-async_session = async_sessionmaker(
-    bind=engine,
-    expire_on_commit=False,
-)
-
-
-async def get_db():
-    async with async_session() as session:
-        yield session
-
