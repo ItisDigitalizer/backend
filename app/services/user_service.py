@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi.params import Depends
 from loguru import logger
 
-from app.auth.utils import hash_password
+from app.auth.security import hash_password
 from app.models.user import User, UserCreate, UserUpdate
 from app.repositories.user_repo import UserRepository
 from app.schemas.user import UserFilters

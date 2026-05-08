@@ -40,6 +40,7 @@ class UserUpdate(SQLModel):
     username: str | None = None
     email: EmailStr | None = None
     role: UserRole | None = None
+    password: str | None = None
 
 
 class UserRead(UserBase, BaseModel):

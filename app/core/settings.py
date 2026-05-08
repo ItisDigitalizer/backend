@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     db_port: int = 5432
     db_name: str = "testdig"
     secret_key: str = "somekey"
-    algorithm = "HS256"
-    access_token_expire_minutes = 30
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
     model_config = SettingsConfigDict(env_file=".env")
 

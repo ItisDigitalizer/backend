@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from app.auth.utils import verify_password, create_access_token, hash_password, decode_access_token, \
-    decode_refresh_token
+from fastapi import HTTPException
+
+from app.auth.security import *
 from app.models.user import UserCreate, User, UserUpdate
 from app.schemas.authentication import LoginRequest
 from app.services.user_service import UserService
@@ -22,14 +23,18 @@ class AuthService:
 
         return await self.user_service.create_user(user_data)
 
-    async def login(self, data: LoginRequest):
-        user = await self.user_service.get_by_username(data.username)
+    async def login(self, username: str, password: str):
+        user = await self.user_service.get_by_username(username)
 
-        if not user or not verify_password(data.password, user.hashed_password):
-            raise ValueError("Invalid credentials")
+        if not user or not verify_password(password, user.password):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
 
         token = create_access_token({"sub": str(user.id)})
-        return {"access_token": token, "token_type": "bearer"}
+
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+        }
 
     async def get_current_user(self, token: str) -> User:
         payload = decode_access_token(token)
@@ -57,24 +62,19 @@ class AuthService:
             old_password: str,
             new_password: str,
     ) -> None:
-        #Получаем пользователя
         user = await self.user_service.get(user_id)
         if not user:
             raise ValueError("User not found")
 
-        #Проверяем старый пароль
-        if not verify_password(old_password, user.hashed_password):
+        if not verify_password(old_password, user.password):
             raise ValueError("Invalid current password")
 
-        #Базовая защита
         if old_password == new_password:
             raise ValueError("New password must be different")
 
-        #Хешируем новый пароль
         new_hashed_password = hash_password(new_password)
 
-        #Сохраняем
         await self.user_service.update_user(
             user_id,
-            UserUpdate(hashed_password=new_hashed_password)
+            UserUpdate(password=new_hashed_password)
         )
