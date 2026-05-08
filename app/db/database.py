@@ -1,5 +1,6 @@
 from sqlalchemy.engine import URL
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, async_session, async_sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from app.core.settings import settings
 
@@ -16,3 +17,15 @@ def form_db_url() -> str:
 
 
 engine = create_async_engine(form_db_url(), echo=True)
+
+
+async_session = async_sessionmaker(
+    bind=engine,
+    expire_on_commit=False,
+)
+
+
+async def get_db():
+    async with async_session() as session:
+        yield session
+

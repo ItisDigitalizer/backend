@@ -4,9 +4,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
+from sqlalchemy.sql.functions import current_user
 
+from app.auth.utils import get_current_user
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserUpdate
+from app.models.user import UserCreate, UserRead, UserUpdate, UserRole, User
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
@@ -37,13 +39,10 @@ async def get_users(
 
 
 @router.get("/me", response_model=UserRead)
-async def get_current_user(
-    # Здесь будет current_user после реализации аутентификации
-    service: UserServiceDep,
+async def get_current_user_route(
+    current_user: User = Depends(get_current_user),
 ):
-    """Получение текущего пользователя (заглушка)"""
-    # TODO: реализовать получение текущего пользователя из токена
-    pass
+    return current_user
 
 
 @router.get("/{user_id}", response_model=UserRead)
@@ -60,6 +59,8 @@ async def get_user(user_id: UUID, service: UserServiceDep):
 @router.patch("/{user_id}", response_model=UserRead)
 async def update_user(user_id: UUID, updates: UserUpdate, service: UserServiceDep):
     """Обновление пользователя"""
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(403, "Forbidden")
     try:
         user = await service.update_user(user_id, updates)
         if not user:
@@ -74,6 +75,8 @@ async def update_user(user_id: UUID, updates: UserUpdate, service: UserServiceDe
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: UUID, service: UserServiceDep):
     """Удаление пользователя"""
+    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(403, "Forbidden")
     user = await service.delete_user(user_id)
     if not user:
         raise HTTPException(

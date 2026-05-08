@@ -31,13 +31,16 @@ class User(BaseModel, UserBase, table=True):
 
 
 class UserCreate(UserBase):
-    pass
+    username: str
+    email: str
+    password: str
 
 
 class UserUpdate(SQLModel):
     username: str | None = None
     email: EmailStr | None = None
     role: UserRole | None = None
+    password: str | None = None
 
 
 class UserRead(UserBase, BaseModel):
