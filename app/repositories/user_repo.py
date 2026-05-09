@@ -23,12 +23,3 @@ class UserRepository(Repository[User]):
         self, filters: UserFilters, offset: int, limit: int
     ) -> Sequence[User]:
         return await self.fetch(filters, offset, limit)
-
-    async def create(self, username: str, password: str, email: str | None = None) -> User:
-        user = User(
-            username=username,
-            hashed_password=password,
-            email=email,
-            is_active=True,
-        )
-        return await self.save(user)

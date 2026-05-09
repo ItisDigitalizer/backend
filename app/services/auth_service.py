@@ -1,80 +1,77 @@
-from uuid import UUID
+from typing import Optional
 
-from fastapi import HTTPException
+from loguru import logger
 
 from app.auth.security import *
-from app.models.user import UserCreate, User, UserUpdate
-from app.schemas.authentication import LoginRequest
-from app.services.user_service import UserService
+from app.models.user import User
+from app.repositories.auth_repo import AuthUserRepository
+from app.schemas.authentication import UserCreate
+from app.services.base import BaseService
 
 
-class AuthService:
-    def __init__(self, user_service: UserService):
-        self.user_service = user_service
+class AuthService(BaseService[User, AuthUserRepository]):
+        def __init__(self, repo: AuthUserRepository):
+            self.repository = repo
 
-    async def register(self, username: str, password: str, email: str):
-        hashed = hash_password(password)
+        async def register(self, username: str, email: str, password: str):
 
-        user_data = UserCreate(
-            username=username,
-            email=email,
-            hashed_password=hashed,
-        )
+            if await self.repository.get_by_username(username):
+                raise ValueError("Username already taken")
 
-        return await self.user_service.create_user(user_data)
+            if await self.repository.get_by_email(email):
+                raise ValueError("Email already registered")
 
-    async def login(self, username: str, password: str):
-        user = await self.user_service.get_by_username(username)
+            return await self.create_user(user_data=UserCreate(username=username, password=password, email=email))
 
-        if not user or not verify_password(password, user.password):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        token = create_access_token({"sub": str(user.id)})
+        async def login(self, username: str, password: str):
+            user = await self.repository.get_by_username(username)
 
-        return {
-            "access_token": token,
-            "token_type": "bearer",
-        }
+            if not user or not verify_password(password, user.password):
+                raise ValueError("Invalid credentials")
 
-    async def get_current_user(self, token: str) -> User:
-        payload = decode_access_token(token)
-        user_id = payload.get("sub")
+            token = create_access_token({"sub": str(user.id)})
 
-        if not user_id:
-            raise ValueError("Invalid token")
+            return {
+                "access_token": token,
+                "token_type": "bearer",
+            }
 
-        user = await self.user_service.get(user_id)
-        if not user:
-            raise ValueError("User not found")
+        async def change_password(self, user_id, old_password, new_password):
+            user = await self.repository.get_by_id(user_id)
 
-        return user
+            if not user:
+                raise ValueError("User not found")
 
-    async def refresh(self, refresh_token: str):
-        payload = decode_refresh_token(refresh_token)
-        user_id = payload.get("sub")
+            if not verify_password(old_password, user.password):
+                raise ValueError("Invalid password")
 
-        new_access = create_access_token({"sub": user_id})
-        return {"access_token": new_access}
+            user.password = hash_password(new_password)
 
-    async def change_password(
-            self,
-            user_id: UUID,
-            old_password: str,
-            new_password: str,
-    ) -> None:
-        user = await self.user_service.get(user_id)
-        if not user:
-            raise ValueError("User not found")
+            await self.repository.update(user)
 
-        if not verify_password(old_password, user.password):
-            raise ValueError("Invalid current password")
+        async def create_user(self, user_data: UserCreate) -> User:
+            """Создание пользователя с проверкой уникальности"""
+            # Проверка email
+            existing_email = await self.get_by_email(user_data.email)
+            if existing_email:
+                raise ValueError(f"User with email {user_data.email} already exists")
 
-        if old_password == new_password:
-            raise ValueError("New password must be different")
+            # Проверка username
+            existing_username = await self.get_by_username(user_data.username)
+            if existing_username:
+                raise ValueError(f"User with username {user_data.username} already exists")
 
-        new_hashed_password = hash_password(new_password)
+            # Здесь должен быть хеширование пароля
+            user_data.password = hash_password(user_data.password)
 
-        await self.user_service.update_user(
-            user_id,
-            UserUpdate(password=new_hashed_password)
-        )
+            logger.info(f"Creating user: {user_data.username}")
+            return await self.create(user_data)
+
+        async def get_by_email(self, email: str) -> Optional[User]:
+            """Получение пользователя по email"""
+            return await self.repository.get_by_email(email)
+
+        async def get_by_username(self, username: str) -> Optional[User]:
+            """Получение пользователя по username"""
+            return await self.repository.get_by_username(username)
