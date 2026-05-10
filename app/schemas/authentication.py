@@ -1,9 +1,7 @@
-import re
-
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel
 from sqlmodel import SQLModel
 
-from app.models.user import UserBase, UserRole
+from app.models.user import UserRole
 
 
 class LoginRequest(BaseModel):
@@ -13,11 +11,12 @@ class LoginRequest(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
 
 
-class UserCreate(UserBase):
-    password: str
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
 
 
 class UserFilters(SQLModel):
@@ -29,6 +28,9 @@ class UserFilters(SQLModel):
         from_attributes = True
 
 
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
+class TokenPayload(BaseModel):
+    sub: str
+    type: str  # "access" / "refresh"
+    iat: int
+    exp: int
+    jti: str

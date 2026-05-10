@@ -3,15 +3,18 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    db_schema: str = "postgresql+asyncpg"
-    db_host: str = "localhost"
-    db_user: str = "postgres"
-    db_password: str = "admin"
-    db_port: int = 5432
-    db_name: str = "testdig"
-    secret_key: str = "somekey"
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
+    db_schema: str
+    db_host: str
+    db_user: str
+    db_password: str
+    db_port: int
+    db_name: str
+
+    secret_key: str
+    algorithm: str
+
+    access_token_expire_minutes: int
+    refresh_token_expire_days: int
 
     model_config = SettingsConfigDict(env_file=".env")
 

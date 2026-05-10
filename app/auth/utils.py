@@ -1,23 +1,15 @@
+#app/auth/utils.py
 from uuid import UUID
 
-from passlib.context import CryptContext
-
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError
 
-import app.models
-from app.core.settings import Settings
-from app.repositories.auth_repo import AuthUserRepository
+from app.auth.security import (
+    oauth2_scheme,
+    decode_access_token,
+)
+from app.models import User, UserRole
 from app.repositories.user_repo import UserRepository
-from app.services.auth_service import AuthService
-from app.services.user_service import UserService
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-settings = Settings()
 
 
 async def get_current_user(
@@ -25,11 +17,7 @@ async def get_current_user(
     user_repo: UserRepository = Depends(),
 ):
     try:
-        payload = jwt.decode(
-            token,
-            settings.secret_key,
-            algorithms=[settings.algorithm],
-        )
+        payload = decode_access_token(token)
 
         user_id = payload.get("sub")
 
@@ -56,8 +44,10 @@ async def get_current_user(
         )
 
 
-async def get_auth_service(
-    auth_user_repo: AuthUserRepository = Depends(AuthUserRepository),
-) -> AuthService:
-    return AuthService(auth_user_repo)
-
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRole.MANAGER:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin only",
+        )
+    return current_user

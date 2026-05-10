@@ -4,7 +4,9 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
+from app.auth.utils import get_current_user, require_admin
 from app.dependencies import GenerationProcessServiceDep
+from app.models import User, UserRole
 from app.models.generation_process import (
     GenerationProcessCreate,
     GenerationProcessRead,
@@ -34,13 +36,23 @@ async def create_process(
 async def get_processes(
     service: GenerationProcessServiceDep,
     pagination: PaginationParam = Depends(),
+    current_user: User = Depends(get_current_user),
     user_id: UUID | None = None,
     template_id: UUID | None = None,
 ):
-    """Получение списка процессов с фильтрацией"""
-    filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
+    # Для обычного пользователя только его процессы
+    if current_user.role != UserRole.MANAGER:
+        user_id = current_user.id
+
+    filters = GenerationProcessFilters(
+        user_id=user_id,
+        template_id=template_id,
+    )
+
     return await service.get_filtered_process(
-        filters, pagination.offset, pagination.limit
+        filters,
+        pagination.offset,
+        pagination.limit,
     )
 
 
@@ -71,7 +83,11 @@ async def update_process(
 
 
 @router.delete("/{process_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_process(process_id: UUID, service: GenerationProcessServiceDep):
+async def delete_process(
+        process_id: UUID,
+        service: GenerationProcessServiceDep,
+        current_user: User = Depends(require_admin),
+):
     """Удаление процесса"""
     process = await service.delete_process(process_id)
     if not process:

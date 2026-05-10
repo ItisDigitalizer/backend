@@ -4,11 +4,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
-from sqlalchemy.sql.functions import current_user
 
-from app.auth.utils import get_current_user
+from app.auth.utils import require_admin
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserUpdate, UserRole, User
+from app.models.user import UserCreate, UserRead, UserUpdate, User
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
@@ -16,7 +15,11 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-async def create_user(user_data: UserCreate, service: UserServiceDep):
+async def create_user(
+        user_data: UserCreate,
+        service: UserServiceDep,
+        current_user: User = Depends(require_admin),
+):
     """Создание нового пользователя"""
     try:
         user = await service.create_user(user_data)
@@ -30,6 +33,7 @@ async def get_users(
     service: UserServiceDep,
     pagination: PaginationParam = Depends(),
     filters: UserFilters = Depends(),
+    current_user: User = Depends(require_admin),
 ):
     """Получение списка пользователей с фильтрацией"""
     users = await service.get_filtered_users(
@@ -38,15 +42,12 @@ async def get_users(
     return users
 
 
-@router.get("/me", response_model=UserRead)
-async def get_current_user_route(
-    current_user: User = Depends(get_current_user),
-):
-    return current_user
-
-
 @router.get("/{user_id}", response_model=UserRead)
-async def get_user(user_id: UUID, service: UserServiceDep):
+async def get_user(
+    user_id: UUID,
+    service: UserServiceDep,
+    current_user: User = Depends(require_admin),
+):
     """Получение пользователя по ID"""
     user = await service.get(user_id)
     if not user:
@@ -57,29 +58,40 @@ async def get_user(user_id: UUID, service: UserServiceDep):
 
 
 @router.patch("/{user_id}", response_model=UserRead)
-async def update_user(user_id: UUID, updates: UserUpdate, service: UserServiceDep):
-    """Обновление пользователя"""
-    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
-        raise HTTPException(403, "Forbidden")
+async def update_user(
+    user_id: UUID,
+    updates: UserUpdate,
+    service: UserServiceDep,
+    current_user: User = Depends(require_admin),
+):
     try:
         user = await service.update_user(user_id, updates)
+
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
             )
+
         return user
+
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: UUID, service: UserServiceDep):
-    """Удаление пользователя"""
-    if current_user.id != user_id and current_user.role != UserRole.ADMIN:
-        raise HTTPException(403, "Forbidden")
+async def delete_user(
+    user_id: UUID,
+    service: UserServiceDep,
+    current_user: User = Depends(require_admin),
+):
     user = await service.delete_user(user_id)
+
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
         )
-    return None

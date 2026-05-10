@@ -100,90 +100,19 @@ dependencies = [
     { name = "aiofiles" },
     { name = "aiosqlite" },
     { name = "alembic" },
-    { name = "annotated-doc" },
-    { name = "annotated-types" },
-    { name = "anyio" },
     { name = "asyncpg" },
-    { name = "bcrypt" },
-    { name = "cachetools" },
-    { name = "certifi" },
-    { name = "cfgv" },
-    { name = "charset-normalizer" },
-    { name = "click" },
-    { name = "colorama" },
-    { name = "distlib" },
-    { name = "dnspython" },
-    { name = "ecdsa" },
-    { name = "email-validator" },
-    { name = "et-xmlfile" },
     { name = "fastapi", extra = ["standard"] },
-    { name = "fastapi-cli" },
-    { name = "fastapi-cloud-cli" },
-    { name = "fastar" },
-    { name = "filelock" },
-    { name = "greenlet" },
-    { name = "h11" },
-    { name = "httpcore" },
-    { name = "httptools" },
     { name = "httpx" },
-    { name = "identify" },
-    { name = "idna" },
-    { name = "iniconfig" },
     { name = "jinja2" },
-    { name = "librt" },
     { name = "loguru" },
-    { name = "lxml" },
-    { name = "mako" },
-    { name = "markdown-it-py" },
-    { name = "markupsafe" },
-    { name = "mdurl" },
-    { name = "mypy" },
-    { name = "mypy-extensions" },
-    { name = "nodeenv" },
     { name = "openpyxl" },
-    { name = "packaging" },
-    { name = "passlib" },
-    { name = "pathspec" },
-    { name = "pip" },
-    { name = "platformdirs" },
-    { name = "pluggy" },
-    { name = "pre-commit" },
-    { name = "pyasn1" },
-    { name = "pydantic" },
-    { name = "pydantic-core" },
-    { name = "pydantic-extra-types" },
+    { name = "pwdlib" },
     { name = "pydantic-settings" },
-    { name = "pygments" },
-    { name = "pytest" },
-    { name = "python-discovery" },
     { name = "python-docx" },
-    { name = "python-dotenv" },
     { name = "python-jose" },
     { name = "python-multipart" },
-    { name = "pyyaml" },
-    { name = "requests" },
-    { name = "rich" },
-    { name = "rich-toolkit" },
-    { name = "rignore" },
-    { name = "rsa" },
-    { name = "ruff" },
-    { name = "sentry-sdk" },
-    { name = "shellingham" },
-    { name = "six" },
     { name = "sqlalchemy" },
     { name = "sqlmodel" },
-    { name = "starlette" },
-    { name = "typer" },
-    { name = "types-cachetools" },
-    { name = "types-requests" },
-    { name = "typing-extensions" },
-    { name = "typing-inspection" },
-    { name = "urllib3" },
-    { name = "uvicorn" },
-    { name = "virtualenv" },
-    { name = "watchfiles" },
-    { name = "websockets" },
-    { name = "win32-setctime" },
 ]
 
 [package.dev-dependencies]
@@ -201,93 +130,22 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiofiles", specifier = "==25.1.0" },
-    { name = "aiosqlite", specifier = "==0.22.1" },
-    { name = "alembic", specifier = "==1.18.4" },
-    { name = "annotated-doc", specifier = "==0.0.4" },
-    { name = "annotated-types", specifier = "==0.7.0" },
-    { name = "anyio", specifier = "==4.13.0" },
-    { name = "asyncpg", specifier = "==0.31.0" },
-    { name = "bcrypt", specifier = "==4.0.1" },
-    { name = "cachetools", specifier = "==7.0.6" },
-    { name = "certifi", specifier = "==2026.4.22" },
-    { name = "cfgv", specifier = "==3.5.0" },
-    { name = "charset-normalizer", specifier = "==3.4.7" },
-    { name = "click", specifier = "==8.3.3" },
-    { name = "colorama", specifier = "==0.4.6" },
-    { name = "distlib", specifier = "==0.4.0" },
-    { name = "dnspython", specifier = "==2.8.0" },
-    { name = "ecdsa", specifier = "==0.19.2" },
-    { name = "email-validator", specifier = "==2.3.0" },
-    { name = "et-xmlfile", specifier = "==2.0.0" },
-    { name = "fastapi", extras = ["standard"], specifier = "==0.136.1" },
-    { name = "fastapi-cli", specifier = "==0.0.24" },
-    { name = "fastapi-cloud-cli", specifier = "==0.17.0" },
-    { name = "fastar", specifier = "==0.11.0" },
-    { name = "filelock", specifier = "==3.29.0" },
-    { name = "greenlet", specifier = "==3.4.0" },
-    { name = "h11", specifier = "==0.16.0" },
-    { name = "httpcore", specifier = "==1.0.9" },
-    { name = "httptools", specifier = "==0.7.1" },
-    { name = "httpx", specifier = "==0.28.1" },
-    { name = "identify", specifier = "==2.6.19" },
-    { name = "idna", specifier = "==3.13" },
-    { name = "iniconfig", specifier = "==2.3.0" },
-    { name = "jinja2", specifier = "==3.1.6" },
-    { name = "librt", specifier = "==0.9.0" },
-    { name = "loguru", specifier = "==0.7.3" },
-    { name = "lxml", specifier = "==6.1.0" },
-    { name = "mako", specifier = "==1.3.11" },
-    { name = "markdown-it-py", specifier = "==4.0.0" },
-    { name = "markupsafe", specifier = "==3.0.3" },
-    { name = "mdurl", specifier = "==0.1.2" },
-    { name = "mypy", specifier = "==1.20.2" },
-    { name = "mypy-extensions", specifier = "==1.1.0" },
-    { name = "nodeenv", specifier = "==1.10.0" },
-    { name = "openpyxl", specifier = "==3.1.5" },
-    { name = "packaging", specifier = "==26.1" },
-    { name = "passlib", specifier = "==1.7.4" },
-    { name = "pathspec", specifier = "==1.1.0" },
-    { name = "pip", specifier = "==25.1.1" },
-    { name = "platformdirs", specifier = "==4.9.6" },
-    { name = "pluggy", specifier = "==1.6.0" },
-    { name = "pre-commit", specifier = "==4.6.0" },
-    { name = "pyasn1", specifier = "==0.6.3" },
-    { name = "pydantic", specifier = "==2.13.3" },
-    { name = "pydantic-core", specifier = "==2.46.3" },
-    { name = "pydantic-extra-types", specifier = "==2.11.1" },
-    { name = "pydantic-settings", specifier = "==2.14.0" },
-    { name = "pygments", specifier = "==2.20.0" },
-    { name = "pytest", specifier = "==9.0.3" },
-    { name = "python-discovery", specifier = "==1.2.2" },
-    { name = "python-docx", specifier = "==1.2.0" },
-    { name = "python-dotenv", specifier = "==1.2.2" },
-    { name = "python-jose", specifier = "==3.5.0" },
-    { name = "python-multipart", specifier = "==0.0.26" },
-    { name = "pyyaml", specifier = "==6.0.3" },
-    { name = "requests", specifier = "==2.33.1" },
-    { name = "rich", specifier = "==15.0.0" },
-    { name = "rich-toolkit", specifier = "==0.19.7" },
-    { name = "rignore", specifier = "==0.7.6" },
-    { name = "rsa", specifier = "==4.9.1" },
-    { name = "ruff", specifier = "==0.15.11" },
-    { name = "sentry-sdk", specifier = "==2.58.0" },
-    { name = "shellingham", specifier = "==1.5.4" },
-    { name = "six", specifier = "==1.17.0" },
-    { name = "sqlalchemy", specifier = "==2.0.49" },
-    { name = "sqlmodel", specifier = "==0.0.38" },
-    { name = "starlette", specifier = "==1.0.0" },
-    { name = "typer", specifier = "==0.24.2" },
-    { name = "types-cachetools", specifier = "==6.2.0.20260408" },
-    { name = "types-requests", specifier = "==2.33.0.20260408" },
-    { name = "typing-extensions", specifier = "==4.15.0" },
-    { name = "typing-inspection", specifier = "==0.4.2" },
-    { name = "urllib3", specifier = "==2.6.3" },
-    { name = "uvicorn", specifier = "==0.46.0" },
-    { name = "virtualenv", specifier = "==21.2.4" },
-    { name = "watchfiles", specifier = "==1.1.1" },
-    { name = "websockets", specifier = "==16.0" },
-    { name = "win32-setctime", specifier = "==1.2.0" },
+    { name = "aiofiles", specifier = ">=25.1.0" },
+    { name = "aiosqlite", specifier = ">=0.22.1" },
+    { name = "alembic", specifier = ">=1.18.4" },
+    { name = "asyncpg", specifier = ">=0.31.0" },
+    { name = "fastapi", extras = ["standard"], specifier = ">=0.135.3" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
+    { name = "pwdlib", specifier = ">=0.3.0" },
+    { name = "pydantic-settings", specifier = ">=2.13.1" },
+    { name = "python-docx", specifier = ">=1.2.0" },
+    { name = "python-jose", specifier = ">=3.5.0" },
+    { name = "python-multipart", specifier = ">=0.0.22" },
+    { name = "sqlalchemy", specifier = ">=2.0.0" },
+    { name = "sqlmodel", specifier = ">=0.0.38" },
 ]
 
 [package.metadata.requires-dev]
@@ -301,25 +159,6 @@ dev = [
     { name = "ruff", specifier = ">=0.15.8" },
     { name = "types-cachetools", specifier = ">=6.2.0.20260317" },
     { name = "types-requests", specifier = ">=2.33.0.20260327" },
-]
-
-[[package]]
-name = "bcrypt"
-version = "4.0.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8c/ae/3af7d006aacf513975fd1948a6b4d6f8b4a307f8a244e1a3d3774b297aad/bcrypt-4.0.1.tar.gz", hash = "sha256:27d375903ac8261cfe4047f6709d16f7d18d39b1ec92aaf72af989552a650ebd", size = 25498, upload-time = "2022-10-09T15:36:49.775Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/d4/3b2657bd58ef02b23a07729b0df26f21af97169dbd0b5797afa9e97ebb49/bcrypt-4.0.1-cp36-abi3-macosx_10_10_universal2.whl", hash = "sha256:b1023030aec778185a6c16cf70f359cbb6e0c289fd564a7cfa29e727a1c38f8f", size = 473446, upload-time = "2022-10-09T15:36:25.481Z" },
-    { url = "https://files.pythonhosted.org/packages/ec/0a/1582790232fef6c2aa201f345577306b8bfe465c2c665dec04c86a016879/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:08d2947c490093a11416df18043c27abe3921558d2c03e2076ccb28a116cb6d0", size = 583044, upload-time = "2022-10-09T15:37:09.447Z" },
-    { url = "https://files.pythonhosted.org/packages/41/16/49ff5146fb815742ad58cafb5034907aa7f166b1344d0ddd7fd1c818bd17/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0eaa47d4661c326bfc9d08d16debbc4edf78778e6aaba29c1bc7ce67214d4410", size = 583189, upload-time = "2022-10-09T15:37:10.69Z" },
-    { url = "https://files.pythonhosted.org/packages/aa/48/fd2b197a9741fa790ba0b88a9b10b5e88e62ff5cf3e1bc96d8354d7ce613/bcrypt-4.0.1-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ae88eca3024bb34bb3430f964beab71226e761f51b912de5133470b649d82344", size = 593473, upload-time = "2022-10-09T15:36:27.195Z" },
-    { url = "https://files.pythonhosted.org/packages/7d/50/e683d8418974a602ba40899c8a5c38b3decaf5a4d36c32fc65dce454d8a8/bcrypt-4.0.1-cp36-abi3-manylinux_2_24_x86_64.whl", hash = "sha256:a522427293d77e1c29e303fc282e2d71864579527a04ddcfda6d4f8396c6c36a", size = 593249, upload-time = "2022-10-09T15:36:28.481Z" },
-    { url = "https://files.pythonhosted.org/packages/fb/a7/ee4561fd9b78ca23c8e5591c150cc58626a5dfb169345ab18e1c2c664ee0/bcrypt-4.0.1-cp36-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:fbdaec13c5105f0c4e5c52614d04f0bca5f5af007910daa8b6b12095edaa67b3", size = 583586, upload-time = "2022-10-09T15:37:11.962Z" },
-    { url = "https://files.pythonhosted.org/packages/64/fe/da28a5916128d541da0993328dc5cf4b43dfbf6655f2c7a2abe26ca2dc88/bcrypt-4.0.1-cp36-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:ca3204d00d3cb2dfed07f2d74a25f12fc12f73e606fcaa6975d1f7ae69cacbb2", size = 593659, upload-time = "2022-10-09T15:36:30.049Z" },
-    { url = "https://files.pythonhosted.org/packages/dd/4f/3632a69ce344c1551f7c9803196b191a8181c6a1ad2362c225581ef0d383/bcrypt-4.0.1-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:089098effa1bc35dc055366740a067a2fc76987e8ec75349eb9484061c54f535", size = 613116, upload-time = "2022-10-09T15:37:14.107Z" },
-    { url = "https://files.pythonhosted.org/packages/87/69/edacb37481d360d06fc947dab5734aaf511acb7d1a1f9e2849454376c0f8/bcrypt-4.0.1-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:e9a51bbfe7e9802b5f3508687758b564069ba937748ad7b9e890086290d2f79e", size = 624290, upload-time = "2022-10-09T15:36:31.251Z" },
-    { url = "https://files.pythonhosted.org/packages/aa/ca/6a534669890725cbb8c1fb4622019be31813c8edaa7b6d5b62fc9360a17e/bcrypt-4.0.1-cp36-abi3-win32.whl", hash = "sha256:2caffdae059e06ac23fce178d31b4a702f2a3264c20bfb5ff541b338194d8fab", size = 159428, upload-time = "2022-10-09T15:36:32.893Z" },
-    { url = "https://files.pythonhosted.org/packages/46/81/d8c22cd7e5e1c6a7d48e41a1d1d46c92f17dae70a54d9814f746e6027dec/bcrypt-4.0.1-cp36-abi3-win_amd64.whl", hash = "sha256:8a68f4341daf7522fe8d73874de8906f3a339048ba406be6ddc1b3ccb16fc0d9", size = 152930, upload-time = "2022-10-09T15:36:34.635Z" },
 ]
 
 [[package]]
@@ -921,30 +760,12 @@ wheels = [
 ]
 
 [[package]]
-name = "passlib"
-version = "1.7.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/b6/06/9da9ee59a67fae7761aab3ccc84fa4f3f33f125b370f1ccdb915bf967c11/passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04", size = 689844, upload-time = "2020-10-08T19:00:52.121Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/a4/ab6b7589382ca3df236e03faa71deac88cae040af60c071a78d254a62172/passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1", size = 525554, upload-time = "2020-10-08T19:00:49.856Z" },
-]
-
-[[package]]
 name = "pathspec"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/2e/17/9c3094b822982b9f1ea666d8580ce59000f61f87c1663556fb72031ad9ec/pathspec-1.1.0.tar.gz", hash = "sha256:f5d7c555da02fd8dde3e4a2354b6aba817a89112fa8f333f7917a2a4834dd080", size = 133918, upload-time = "2026-04-23T01:46:22.298Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/c9/8eed0486f074e9f1ca7f8ce5ad663e65f12fdab344028d658fa1b03d35e0/pathspec-1.1.0-py3-none-any.whl", hash = "sha256:574b128f7456bd899045ccd142dd446af7e6cfd0072d63ad73fbc55fbb4aaa42", size = 56264, upload-time = "2026-04-23T01:46:20.606Z" },
-]
-
-[[package]]
-name = "pip"
-version = "25.1.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/59/de/241caa0ca606f2ec5fe0c1f4261b0465df78d786a38da693864a116c37f4/pip-25.1.1.tar.gz", hash = "sha256:3de45d411d308d5054c2168185d8da7f9a2cd753dbac8acbfa88a8909ecd9077", size = 1940155, upload-time = "2025-05-02T15:14:02.057Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/a2/d40fb2460e883eca5199c62cfc2463fd261f760556ae6290f88488c362c0/pip-25.1.1-py3-none-any.whl", hash = "sha256:2913a38a2abf4ea6b64ab507bd9e967f3b53dc1ede74b01b0931e1ce548751af", size = 1825227, upload-time = "2025-05-02T15:13:59.102Z" },
 ]
 
 [[package]]
@@ -979,6 +800,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8e/22/2de9408ac81acbb8a7d05d4cc064a152ccf33b3d480ebe0cd292153db239/pre_commit-4.6.0.tar.gz", hash = "sha256:718d2208cef53fdc38206e40524a6d4d9576d103eb16f0fec11c875e7716e9d9", size = 198525, upload-time = "2026-04-21T20:31:41.613Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/80/6e/4b28b62ecb6aae56769c34a8ff1d661473ec1e9519e2d5f8b2c150086b26/pre_commit-4.6.0-py2.py3-none-any.whl", hash = "sha256:e2cf246f7299edcabcf15f9b0571fdce06058527f0a06535068a86d38089f29b", size = 226472, upload-time = "2026-04-21T20:31:40.092Z" },
+]
+
+[[package]]
+name = "pwdlib"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/41/a7c0d8a003c36ce3828ae3ed0391fe6a15aad65f082dbd6bec817ea95c0b/pwdlib-0.3.0.tar.gz", hash = "sha256:6ca30f9642a1467d4f5d0a4d18619de1c77f17dfccb42dd200b144127d3c83fc", size = 215810, upload-time = "2025-10-25T12:44:24.395Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/62/0c/9086a357d02a050fbb3270bf5043ac284dbfb845670e16c9389a41defc9e/pwdlib-0.3.0-py3-none-any.whl", hash = "sha256:f86c15c138858c09f3bba0a10984d4f9178158c55deaa72eac0210849b1a140d", size = 8633, upload-time = "2025-10-25T12:44:23.406Z" },
 ]
 
 [[package]]
