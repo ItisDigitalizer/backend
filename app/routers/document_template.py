@@ -4,7 +4,9 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
+from app.auth.utils import require_admin
 from app.dependencies import DocumentTemplateServiceDep
+from app.models import User
 from app.models.document_template import (
     DocumentTemplateCreate,
     DocumentTemplateRead,
@@ -20,7 +22,8 @@ router = APIRouter(prefix="/templates", tags=["templates"])
     "/", response_model=DocumentTemplateRead, status_code=status.HTTP_201_CREATED
 )
 async def create_template(
-    data: DocumentTemplateCreate, service: DocumentTemplateServiceDep
+    data: DocumentTemplateCreate, service: DocumentTemplateServiceDep,
+    current_user: User = Depends(require_admin),
 ):
     """Создание нового шаблона"""
     try:
@@ -60,6 +63,7 @@ async def update_template(
     template_id: UUID,
     updates: DocumentTemplateUpdate,
     service: DocumentTemplateServiceDep,
+    current_user: User = Depends(require_admin),
 ):
     """Обновление шаблона"""
     template = await service.update_template(template_id, updates)
@@ -71,7 +75,11 @@ async def update_template(
 
 
 @router.delete("/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_template(template_id: UUID, service: DocumentTemplateServiceDep):
+async def delete_template(
+        template_id: UUID,
+        service: DocumentTemplateServiceDep,
+        current_user: User = Depends(require_admin),
+):
     """Удаление шаблона"""
     template = await service.delete_template(template_id)
     if not template:

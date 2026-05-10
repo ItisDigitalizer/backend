@@ -30,10 +30,6 @@ app = FastAPI(
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(users.router)
 api_router.include_router(authentication.router)
-
-# router.include_router(templates.router)
-# router.include_router(documents.router)
-
 api_router.include_router(generated_document.router)
 api_router.include_router(generation_process.router)
 api_router.include_router(document_template.router)

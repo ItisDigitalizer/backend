@@ -1,28 +1,37 @@
-from typing import Optional
+#app/services/auth_service
+from uuid import UUID
 
-from loguru import logger
+from fastapi import Depends
 
+from app.auth.password_utils import verify_password
 from app.auth.security import *
-from app.models.user import User
-from app.repositories.auth_repo import AuthUserRepository
-from app.schemas.authentication import UserCreate
+from app.models import RefreshSession
+from app.models.user import User, UserCreate
+from app.repositories.refresh_session_repo import RefreshSessionRepository
+from app.repositories.user_repo import UserRepository
 from app.services.base import BaseService
+from app.services.user_service import UserService
 
 
-class AuthService(BaseService[User, AuthUserRepository]):
-        def __init__(self, repo: AuthUserRepository):
+class AuthService(BaseService[User, UserRepository]):
+        def __init__(self,
+                repo: UserRepository = Depends(),
+                service: UserService = Depends(),
+                refresh_repo: RefreshSessionRepository = Depends(),
+        ):
             self.repository = repo
+            self.service = service
+            self.refresh_session_repository = refresh_repo
 
-        async def register(self, username: str, email: str, password: str):
+        async def register(self, user_data: UserCreate):
 
-            if await self.repository.get_by_username(username):
+            if await self.repository.get_by_username(user_data.username):
                 raise ValueError("Username already taken")
 
-            if await self.repository.get_by_email(email):
+            if await self.repository.get_by_email(user_data.email):
                 raise ValueError("Email already registered")
 
-            return await self.create_user(user_data=UserCreate(username=username, password=password, email=email))
-
+            return await self.service.create_user(user_data)
 
         async def login(self, username: str, password: str):
             user = await self.repository.get_by_username(username)
@@ -30,48 +39,69 @@ class AuthService(BaseService[User, AuthUserRepository]):
             if not user or not verify_password(password, user.password):
                 raise ValueError("Invalid credentials")
 
-            token = create_access_token({"sub": str(user.id)})
+            access_token = create_access_token(str(user.id))
+
+            refresh_token, payload = create_refresh_token(str(user.id))
 
             return {
-                "access_token": token,
-                "token_type": "bearer",
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             }
 
-        async def change_password(self, user_id, old_password, new_password):
-            user = await self.repository.get_by_id(user_id)
+        async def refresh_tokens(self, refresh_token: str):
+            try:
+                payload = decode_refresh_token(refresh_token)
 
-            if not user:
-                raise ValueError("User not found")
+                jti = payload["jti"]
+                user_id = payload["sub"]
 
-            if not verify_password(old_password, user.password):
-                raise ValueError("Invalid password")
+                session = await self.refresh_session_repository.get_by_jti(jti)
 
-            user.password = hash_password(new_password)
+                if not session:
+                    raise ValueError("Session not found")
 
-            await self.repository.update(user)
+                if getattr(session, "is_revoked", False):
+                    raise ValueError("Session revoked")
 
-        async def create_user(self, user_data: UserCreate) -> User:
-            """Создание пользователя с проверкой уникальности"""
-            # Проверка email
-            existing_email = await self.get_by_email(user_data.email)
-            if existing_email:
-                raise ValueError(f"User with email {user_data.email} already exists")
+                if session.expires_at < datetime.utcnow():
+                    raise ValueError("Session expired")
 
-            # Проверка username
-            existing_username = await self.get_by_username(user_data.username)
-            if existing_username:
-                raise ValueError(f"User with username {user_data.username} already exists")
+                await self.refresh_session_repository.delete(session.id)
 
-            # Здесь должен быть хеширование пароля
-            user_data.password = hash_password(user_data.password)
+                new_access = create_access_token(user_id)
+                new_refresh, refresh_payload = create_refresh_token(user_id)
 
-            logger.info(f"Creating user: {user_data.username}")
-            return await self.create(user_data)
+                await self.refresh_session_repository.save(
+                    RefreshSession(
+                        user_id=user_id,
+                        jti=refresh_payload.jti,
+                        expires_at=datetime.fromtimestamp(refresh_payload.exp),
+                    )
+                )
 
-        async def get_by_email(self, email: str) -> Optional[User]:
-            """Получение пользователя по email"""
-            return await self.repository.get_by_email(email)
+                return {
+                    "access_token": new_access,
+                    "refresh_token": new_refresh,
+                }
 
-        async def get_by_username(self, username: str) -> Optional[User]:
-            """Получение пользователя по username"""
-            return await self.repository.get_by_username(username)
+            except JWTError:
+                raise ValueError("Invalid refresh token")
+
+        async def logout(self, refresh_token: str):
+            try:
+                print("RAW TOKEN REPR:", repr(refresh_token))
+
+                payload = decode_refresh_token(refresh_token)
+
+                jti = payload.get("jti")
+
+                if not jti:
+                    raise ValueError("Invalid token")
+
+                session = await self.refresh_session_repository.get_by_jti(jti)
+
+                if session:
+                    await self.refresh_session_repository.delete(session.id)
+
+            except JWTError:
+                raise ValueError("Invalid token")
