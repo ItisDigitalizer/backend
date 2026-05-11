@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 from sqlmodel import SQLModel
 
@@ -15,10 +17,6 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-class TokenRefreshRequest(BaseModel):
-    refresh_token: str
-
-
 class UserFilters(SQLModel):
     username: str | None = None
     email: str | None = None
@@ -33,4 +31,14 @@ class TokenPayload(BaseModel):
     type: str  # "access" / "refresh"
     iat: int
     exp: int
-    jti: str
+    jti: UUID
+
+
+class RefreshSessionFilters(BaseModel):
+    jti: UUID | None = None
+    user_id: UUID | None = None
+
+
+class LogoutResponse(BaseModel):
+    success: bool
+    message: str | None = None

@@ -90,3 +90,15 @@ class Repository(Generic[ModelType]):
                 setattr(instance, key, value)
 
         return await self.save(instance)
+
+    async def fetch_one(
+            self,
+            filters: Optional[PydanticBaseModel] = None,
+    ) -> ModelType | None:
+        """Получение одной записи"""
+        results = await self.fetch(
+            filters=filters,
+            limit=1,
+        )
+
+        return results[0] if results else None

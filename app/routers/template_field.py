@@ -5,8 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.auth.utils import require_admin
-from app.dependencies import TemplateFieldServiceDep
-from app.models import User
+from app.dependencies import TemplateFieldServiceDep, AdminRequiredDep
 from app.models.template_field import (
     TemplateFieldCreate,
     TemplateFieldRead,
@@ -18,11 +17,15 @@ from app.schemas.template_field import TemplateFieldFilters
 router = APIRouter(prefix="/fields", tags=["fields"])
 
 
-@router.post("/", response_model=TemplateFieldRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=TemplateFieldRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin)]
+)
 async def create_field(
     data: TemplateFieldCreate,
     service: TemplateFieldServiceDep,
-    current_user: User = Depends(require_admin),
 ):
     """Создание нового поля шаблона"""
     try:
@@ -56,12 +59,15 @@ async def get_field(field_id: UUID, service: TemplateFieldServiceDep):
     return field
 
 
-@router.patch("/{field_id}", response_model=TemplateFieldRead)
+@router.patch(
+    "/{field_id}",
+    response_model=TemplateFieldRead,
+    dependencies=[Depends(require_admin)]
+)
 async def update_field(
     field_id: UUID,
     updates: TemplateFieldUpdate,
     service: TemplateFieldServiceDep,
-    current_user: User = Depends(require_admin),
 ):
     """Обновление поля"""
     field = await service.update_field(field_id, updates)
@@ -72,11 +78,14 @@ async def update_field(
     return field
 
 
-@router.delete("/{field_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{field_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_admin)]
+)
 async def delete_field(
         field_id: UUID,
         service: TemplateFieldServiceDep,
-        current_user: User = Depends(require_admin)
 ):
     """Удаление поля"""
     field = await service.delete_field(field_id)

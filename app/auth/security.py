@@ -11,56 +11,59 @@ from app.schemas.authentication import TokenPayload
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
-def create_access_token(subject: str) -> str:
+def _create_token(
+    subject: str,
+    token_type: str,
+    expires_delta: timedelta,
+) -> tuple[str, TokenPayload]:
+
     now = datetime.now(timezone.utc)
 
     payload = TokenPayload(
         sub=subject,
-        type="access",
+        type=token_type,
         iat=int(now.timestamp()),
-        exp=int(
-            (now + timedelta(minutes=settings.access_token_expire_minutes)).timestamp()
-        ),
-        jti=str(uuid4()),
-    )
-
-    return jwt.encode(
-        payload.model_dump(),
-        settings.secret_key,
-        algorithm=settings.algorithm,
-    )
-
-
-def create_refresh_token(subject: str) -> tuple[str, TokenPayload]:
-    now = datetime.now(timezone.utc)
-
-    payload = TokenPayload(
-        sub=subject,
-        type="refresh",
-        iat=int(now.timestamp()),
-        exp=int(
-            (
-                now + timedelta(days=settings.refresh_token_expire_days)
-            ).timestamp()
-        ),
-        jti=str(uuid4()),
+        exp=int((now + expires_delta).timestamp()),
+        jti=uuid4(),
     )
 
     token = jwt.encode(
-        payload.model_dump(),
-        settings.secret_key,
-        algorithm=settings.algorithm,
+        payload.model_dump(mode="json"),
+        settings.auth.secret_key,
+        algorithm=settings.auth.algorithm,
     )
 
     return token, payload
+
+
+def create_access_token(subject: str) -> str:
+    token, _ = _create_token(
+        subject=subject,
+        token_type="access",
+        expires_delta=timedelta(
+            minutes=settings.auth.access_token_expire_minutes
+        ),
+    )
+
+    return token
+
+
+def create_refresh_token(subject: str) -> tuple[str, TokenPayload]:
+    return _create_token(
+        subject=subject,
+        token_type="refresh",
+        expires_delta=timedelta(
+            days=settings.auth.refresh_token_expire_days
+        ),
+    )
 
 
 def decode_token(token: str) -> dict:
     try:
         return jwt.decode(
             token,
-            settings.secret_key,
-            algorithms=[settings.algorithm],
+            settings.auth.secret_key,
+            algorithms=[settings.auth.algorithm],
         )
     except JWTError:
         raise ValueError("Invalid token")
