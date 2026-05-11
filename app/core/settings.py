@@ -4,17 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DatabaseSettings(BaseSettings):
-    db_schema: str
-    db_host: str
-    db_user: str
-    db_password: str
-    db_port: int
-    db_name: str
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        extra="ignore",
-    )
+    driver: str
+    host: str
+    user: str
+    password: str
+    port: int
+    name: str
 
 
 class AuthSettings(BaseSettings):
@@ -24,15 +19,16 @@ class AuthSettings(BaseSettings):
     access_token_expire_minutes: int
     refresh_token_expire_days: int
 
+
+class Settings(BaseSettings):
+    db: DatabaseSettings
+    auth: AuthSettings
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
+        env_nested_delimiter="__",
     )
-
-
-class Settings:
-    db = DatabaseSettings()
-    auth = AuthSettings()
 
 
 @lru_cache

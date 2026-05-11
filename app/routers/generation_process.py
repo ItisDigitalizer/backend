@@ -37,26 +37,23 @@ async def get_processes(
     service: GenerationProcessServiceDep,
     pagination: PaginationParam = Depends(),
     current_user: User = Depends(get_current_user),
-    user_id: UUID | None = None,
 ):
     # Пользователь не может просматривать чужие процессы
     if current_user.role == UserRole.USER:
         # Если id не совпадают, значит обычный пользователь хочет просмотреть чужие процессы
-        if user_id and user_id != current_user.id:
+        if filters.user_id and filters.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough permissions",
             )
-        # Накладываем ограничение на случай, если user_id не передан,
-        # но при этом пользователь авторизован, или на случай,
-        # если user_id совпал с current_user.id
-        filters.user_id = current_user.id
-    # Если же есть роль менеджера, то в зависимости от того, передан user_id или нет,
-    # выдаём либо список процессов пользователя с переданным id,
-    # либо все процессы всех пользователей
-    elif current_user.role == UserRole.MANAGER:
-        if user_id:
-            filters.user_id = user_id
+        #Если user_id вообще не передан, то запрещаем просмотр
+        elif not filters.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User ID is missing",
+            )
+    # Если же есть роль менеджера, то ничего дополнительно не делаем,
+    # потому что он может смотреть любые процессы
 
     return await service.get_filtered_process(
         filters,
