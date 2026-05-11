@@ -7,18 +7,22 @@ from fastapi.params import Depends
 
 from app.auth.utils import require_admin
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserUpdate, User
+from app.models.user import UserCreate, UserRead, UserUpdate
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin)],
+)
 async def create_user(
         user_data: UserCreate,
         service: UserServiceDep,
-        current_user: User = Depends(require_admin),
 ):
     """Создание нового пользователя"""
     try:
@@ -28,12 +32,15 @@ async def create_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/", response_model=List[UserRead])
+@router.get(
+    "/",
+    response_model=List[UserRead],
+    dependencies=[Depends(require_admin)],
+)
 async def get_users(
     service: UserServiceDep,
     pagination: PaginationParam = Depends(),
     filters: UserFilters = Depends(),
-    current_user: User = Depends(require_admin),
 ):
     """Получение списка пользователей с фильтрацией"""
     users = await service.get_filtered_users(
@@ -42,11 +49,14 @@ async def get_users(
     return users
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get(
+    "/{user_id}",
+    response_model=UserRead,
+    dependencies=[Depends(require_admin)]
+)
 async def get_user(
     user_id: UUID,
     service: UserServiceDep,
-    current_user: User = Depends(require_admin),
 ):
     """Получение пользователя по ID"""
     user = await service.get(user_id)
@@ -57,12 +67,15 @@ async def get_user(
     return user
 
 
-@router.patch("/{user_id}", response_model=UserRead)
+@router.patch(
+    "/{user_id}",
+    response_model=UserRead,
+    dependencies=[Depends(require_admin)]
+)
 async def update_user(
     user_id: UUID,
     updates: UserUpdate,
     service: UserServiceDep,
-    current_user: User = Depends(require_admin),
 ):
     try:
         user = await service.update_user(user_id, updates)
@@ -82,11 +95,14 @@ async def update_user(
         )
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_admin)]
+)
 async def delete_user(
     user_id: UUID,
     service: UserServiceDep,
-    current_user: User = Depends(require_admin),
 ):
     user = await service.delete_user(user_id)
 

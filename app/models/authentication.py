@@ -1,7 +1,8 @@
-from datetime import datetime
+import uuid
+from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, TIMESTAMP
 from sqlmodel import Field, Relationship
 
 from app.models import User
@@ -19,13 +20,17 @@ class RefreshSession(BaseModel, table=True):
 
     user: "User" = Relationship(back_populates="sessions")
 
-    jti: str = Field(
+    jti: uuid.UUID = Field(
         unique=True,
         index=True,
         nullable=False,
     )
 
-    expires_at: datetime = Field(nullable=False)
+    expires_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        nullable=False,
+        sa_type=TIMESTAMP(timezone=True),  # type: ignore
+    )
 
     revoked: bool = Field(
         default=False,

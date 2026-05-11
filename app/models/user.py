@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import TYPE_CHECKING, List
-from uuid import UUID
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
@@ -46,11 +45,5 @@ class UserUpdate(SQLModel):
     role: UserRole | None = None
 
 
-class UserRead(BaseModel):
-    id: UUID
-    username: str
-    email: str
-    role: str
-
-    class Config:
-        from_attributes = True
+class UserRead(UserBase, BaseModel):
+    pass

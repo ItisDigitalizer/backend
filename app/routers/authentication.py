@@ -1,20 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi import Response
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.params import Cookie
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Request
 
+from app.dependencies import AuthServiceDep
 from app.models.user import User, UserCreate, UserRead
 from app.auth.utils import get_current_user
-from app.services.auth_service import AuthService
+from app.schemas.authentication import TokenResponse, LogoutResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/login")
+@router.post("/login", response_model=TokenResponse)
 async def login(
     response: Response,
+    service: AuthServiceDep,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    service: AuthService = Depends(),
 ):
     tokens = await service.login(
         form_data.username,
@@ -23,15 +23,11 @@ async def login(
 
     response.set_cookie(
         key="refresh_token",
-        value=tokens["refresh_token"],
+        value=tokens.refresh_token,
         httponly=True,
     )
 
-    return {
-        "access_token": tokens["access_token"],
-        "refresh_token": tokens["refresh_token"],
-        "token_type": "bearer",
-    }
+    return tokens
 
 
 @router.get("/me", response_model=UserRead)
@@ -44,50 +40,39 @@ async def me(
 @router.post("/register")
 async def register(
     data: UserCreate,
-    service: AuthService = Depends(),
+    service: AuthServiceDep,
 ):
-    return await service.register(UserCreate(username=data.username, email=data.email, password=data.password)
-    )
+    return await service.register(data)
+
 
 @router.post("/refresh")
 async def refresh(
-    request: Request,
-    response: Response,
-    service: AuthService = Depends(),
+    service: AuthServiceDep,
+    refresh_token: str | None = Cookie(default=None),
 ):
-    refresh_token = request.cookies.get("refresh_token")
-
-    if not refresh_token:
-        raise HTTPException(status_code=401, detail="No refresh token")
-
-    tokens = await service.refresh_tokens(refresh_token)
-
-    response.set_cookie(
-        key="refresh_token",
-        value=tokens["refresh_token"],
-        httponly=True,
-        samesite="lax",
-    )
-
-    return {
-        "access_token": tokens["access_token"],
-        "token_type": "bearer",
-    }
+    return await service.refresh_tokens(refresh_token)
 
 
-@router.post("/logout")
+@router.post("/logout", response_model=LogoutResponse)
 async def logout(
-    request: Request,
+    service: AuthServiceDep,
     response: Response,
-    service: AuthService = Depends(),
+    refresh_token: str | None = Cookie(default=None),
 ):
-    refresh_token = request.cookies.get("refresh_token")
-
     if not refresh_token:
-        raise HTTPException(status_code=401, detail="No refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
 
-    await service.logout(refresh_token)
+    try:
+        await service.logout(refresh_token)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+        )
 
     response.delete_cookie("refresh_token")
 
-    return {"success": True}
+    return LogoutResponse(success=True)
