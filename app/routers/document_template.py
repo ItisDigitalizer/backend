@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
+from app.auth.utils import require_admin
 from app.dependencies import DocumentTemplateServiceDep
 from app.models.document_template import (
     DocumentTemplateCreate,
@@ -17,17 +18,23 @@ router = APIRouter(prefix="/templates", tags=["templates"])
 
 
 @router.post(
-    "/", response_model=DocumentTemplateRead, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=DocumentTemplateRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_admin)]
 )
 async def create_template(
-    data: DocumentTemplateCreate, service: DocumentTemplateServiceDep
+    data: DocumentTemplateCreate,
+    service: DocumentTemplateServiceDep,
 ):
     """Создание нового шаблона"""
     try:
-        template = await service.create_template(data)
-        return template
+        return await service.create_template(data)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 @router.get("/", response_model=List[DocumentTemplateRead])
@@ -55,7 +62,11 @@ async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
     return template
 
 
-@router.patch("/{template_id}", response_model=DocumentTemplateRead)
+@router.patch(
+    "/{template_id}",
+    response_model=DocumentTemplateRead,
+    dependencies=[Depends(require_admin)]
+)
 async def update_template(
     template_id: UUID,
     updates: DocumentTemplateUpdate,
@@ -70,8 +81,15 @@ async def update_template(
     return template
 
 
-@router.delete("/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_template(template_id: UUID, service: DocumentTemplateServiceDep):
+@router.delete(
+    "/{template_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_admin)]
+)
+async def delete_template(
+        template_id: UUID,
+        service: DocumentTemplateServiceDep,
+):
     """Удаление шаблона"""
     template = await service.delete_template(template_id)
     if not template:

@@ -4,13 +4,14 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
-from app.dependencies import GenerationProcessServiceDep
+from app.auth.utils import get_current_user, require_admin
+from app.dependencies import GenerationProcessServiceDep, GenerationProcessFiltersDep
+from app.models import User, UserRole
 from app.models.generation_process import (
     GenerationProcessCreate,
     GenerationProcessRead,
     GenerationProcessUpdate,
 )
-from app.schemas.generation_process import GenerationProcessFilters
 from app.schemas.pagination import PaginationParam
 
 router = APIRouter(prefix="/processes", tags=["processes"])
@@ -32,30 +33,63 @@ async def create_process(
 
 @router.get("/", response_model=List[GenerationProcessRead])
 async def get_processes(
+    filters: GenerationProcessFiltersDep,
     service: GenerationProcessServiceDep,
     pagination: PaginationParam = Depends(),
-    user_id: UUID | None = None,
-    template_id: UUID | None = None,
+    current_user: User = Depends(get_current_user),
 ):
-    """Получение списка процессов с фильтрацией"""
-    filters = GenerationProcessFilters(user_id=user_id, template_id=template_id)
+    # Пользователь не может просматривать чужие процессы
+    if current_user.role == UserRole.USER:
+        # Если id не совпадают, значит обычный пользователь хочет просмотреть чужие процессы
+        if filters.user_id and filters.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions",
+            )
+        #Если user_id вообще не передан, то запрещаем просмотр
+        elif not filters.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User ID is missing",
+            )
+    # Если же есть роль менеджера, то ничего дополнительно не делаем,
+    # потому что он может смотреть любые процессы
+
     return await service.get_filtered_process(
-        filters, pagination.offset, pagination.limit
+        filters,
+        pagination.offset,
+        pagination.limit,
     )
 
 
 @router.get("/{process_id}", response_model=GenerationProcessRead)
-async def get_process(process_id: UUID, service: GenerationProcessServiceDep):
-    """Получение процесса по ID"""
+async def get_process(
+    process_id: UUID,
+    service: GenerationProcessServiceDep,
+    current_user: User = Depends(get_current_user),
+):
+    """Получение процесса по ID с проверкой прав"""
     process = await service.get(process_id)
     if not process:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Process not found"
         )
+
+    # Проверка, не пытается ли человек без админки посмотреть не свой процесс
+    if current_user.role != UserRole.MANAGER and process.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions to view this process",
+        )
+
     return process
 
 
-@router.patch("/{process_id}", response_model=GenerationProcessRead)
+@router.patch(
+    "/{process_id}",
+    response_model=GenerationProcessRead,
+    dependencies=[Depends(require_admin)]
+)
 async def update_process(
     process_id: UUID,
     updates: GenerationProcessUpdate,
@@ -70,8 +104,15 @@ async def update_process(
     return process
 
 
-@router.delete("/{process_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_process(process_id: UUID, service: GenerationProcessServiceDep):
+@router.delete(
+    "/{process_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_admin)]
+)
+async def delete_process(
+        process_id: UUID,
+        service: GenerationProcessServiceDep,
+):
     """Удаление процесса"""
     process = await service.delete_process(process_id)
     if not process:

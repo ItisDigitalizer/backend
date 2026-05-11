@@ -1,16 +1,34 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class DatabaseSettings(BaseSettings):
+    driver: str
+    host: str
+    user: str
+    password: str
+    port: int
+    name: str
+
+
+class AuthSettings(BaseSettings):
+    secret_key: str
+    algorithm: str
+
+    access_token_expire_minutes: int
+    refresh_token_expire_days: int
 
 
 class Settings(BaseSettings):
-    db_schema: str = "postgresql+asyncpg"
-    db_host: str = "localhost"
-    db_user: str = "postgres"
-    db_password: str = "admin"
-    db_port: int = 5432
-    db_name: str = "testdig"
+    db: DatabaseSettings
+    auth: AuthSettings
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+        env_nested_delimiter="__",
+    )
 
 
 @lru_cache

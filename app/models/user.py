@@ -9,6 +9,7 @@ from app.models.base import BaseModel
 if TYPE_CHECKING:
     from app.models.document_template import DocumentTemplate
     from app.models.generation_process import GenerationProcess
+    from app.models.authentication import RefreshSession
 
 
 class UserRole(str, Enum):
@@ -28,10 +29,14 @@ class User(BaseModel, UserBase, table=True):
     password: str
     templates: List["DocumentTemplate"] = Relationship(back_populates="user")
     processes: List["GenerationProcess"] = Relationship(back_populates="user")
+    sessions: list["RefreshSession"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"cascade": "all, delete"}
+    )
 
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 
 class UserUpdate(SQLModel):
