@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.auth.utils import require_admin
-from app.dependencies import DocumentTemplateServiceDep, AdminRequiredDep
+from app.dependencies import DocumentTemplateServiceDep
 from app.models.document_template import (
     DocumentTemplateCreate,
     DocumentTemplateRead,

@@ -118,6 +118,12 @@ class AuthService(BaseService[User, UserRepository]):
                     if session:
                         await self.refresh_session_repository.delete(session.id)
 
+                    if not session:
+                        raise HTTPException(
+                            status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Invalid refresh session",
+                        )
+
                 except JWTError:
                     pass
 

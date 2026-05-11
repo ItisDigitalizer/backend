@@ -7,7 +7,7 @@ from fastapi.params import Depends
 
 from app.auth.utils import require_admin
 from app.dependencies import UserServiceDep
-from app.models.user import UserCreate, UserRead, UserUpdate, User
+from app.models.user import UserCreate, UserRead, UserUpdate
 from app.schemas.pagination import PaginationParam
 from app.schemas.user import UserFilters
 

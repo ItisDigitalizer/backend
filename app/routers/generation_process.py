@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.auth.utils import get_current_user, require_admin
-from app.dependencies import GenerationProcessServiceDep, GenerationProcessFiltersDep, AdminRequiredDep
+from app.dependencies import GenerationProcessServiceDep, GenerationProcessFiltersDep
 from app.models import User, UserRole
 from app.models.generation_process import (
     GenerationProcessCreate,

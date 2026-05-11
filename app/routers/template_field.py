@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.auth.utils import require_admin
-from app.dependencies import TemplateFieldServiceDep, AdminRequiredDep
+from app.dependencies import TemplateFieldServiceDep
 from app.models.template_field import (
     TemplateFieldCreate,
     TemplateFieldRead,

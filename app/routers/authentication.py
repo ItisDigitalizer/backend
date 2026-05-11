@@ -59,13 +59,19 @@ async def logout(
     response: Response,
     refresh_token: str | None = Cookie(default=None),
 ):
-    if refresh_token is None:
+    if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
         )
 
-    await service.logout(refresh_token)
+    try:
+        await service.logout(refresh_token)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+        )
 
     response.delete_cookie("refresh_token")
 
