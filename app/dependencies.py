@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi.params import Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from app.auth.utils import require_admin
 from app.db.session import get_session
 from app.schemas.generation_process import GenerationProcessFilters
 from app.services.auth_service import AuthService

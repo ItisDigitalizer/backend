@@ -45,12 +45,27 @@ async def register(
     return await service.register(data)
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh(
+    response: Response,
     service: AuthServiceDep,
     refresh_token: str | None = Cookie(default=None),
 ):
-    return await service.refresh_tokens(refresh_token)
+    if refresh_token is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+
+    tokens = await service.refresh_tokens(refresh_token)
+
+    response.set_cookie(
+        key="refresh_token",
+        value=tokens.refresh_token,
+        httponly=True,
+    )
+
+    return tokens
 
 
 @router.post("/logout", response_model=LogoutResponse)

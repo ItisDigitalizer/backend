@@ -1,18 +1,17 @@
 from sqlalchemy.engine import URL
-from sqlalchemy.ext.asyncio import create_async_engine, async_session, async_sessionmaker
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.settings import settings
 
 
 def form_db_url() -> str:
     return URL.create(
-        drivername=settings.db.db_schema,
-        username=settings.db.db_user,
-        password=settings.db.db_password,
-        host=settings.db.db_host,
-        port=settings.db.db_port,
-        database=settings.db.db_name,
+        drivername=settings.db.driver,
+        username=settings.db.user,
+        password=settings.db.password,
+        host=settings.db.host,
+        port=settings.db.port,
+        database=settings.db.name,
     ).render_as_string(hide_password=False)
 
 
