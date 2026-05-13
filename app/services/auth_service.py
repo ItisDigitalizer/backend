@@ -15,9 +15,9 @@ from app.models.user import User, UserCreate
 from app.repositories.refresh_session_repo import RefreshSessionRepository
 from app.repositories.user_repo import UserRepository
 from app.schemas.authentication import (
-    TokenResponse,
-    RefreshSessionFilters,
     LogoutResponse,
+    RefreshSessionFilters,
+    TokenResponse,
     TokenPayload,
 )
 from app.services.base import BaseService
