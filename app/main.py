@@ -8,7 +8,7 @@ from app.routers import (
     generation_process,
     document_template,
     template_field,
-    authentication
+    authentication,
 )
 from fastapi import APIRouter
 

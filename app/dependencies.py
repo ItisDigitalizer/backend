@@ -32,4 +32,6 @@ TemplateFieldServiceDep = Annotated[TemplateFieldService, Depends(TemplateFieldS
 
 AuthServiceDep = Annotated[AuthService, Depends(AuthService)]
 
-GenerationProcessFiltersDep = Annotated[GenerationProcessFilters, Depends(GenerationProcessFilters)]
+GenerationProcessFiltersDep = Annotated[
+    GenerationProcessFilters, Depends(GenerationProcessFilters)
+]

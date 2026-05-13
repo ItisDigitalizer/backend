@@ -15,7 +15,7 @@ class DocumentTemplateBase(SQLModel):
     name: str = Field(nullable=False)
     description: str
     user_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
-    file_path: int
+    file_path: str
 
 
 class DocumentTemplate(BaseModel, DocumentTemplateBase, table=True):
@@ -33,7 +33,7 @@ class DocumentTemplateCreate(DocumentTemplateBase):
 class DocumentTemplateUpdate(SQLModel):
     name: str | None = None
     description: str | None = None
-    file_path: int | None = None
+    file_path: str | None = None
 
 
 class DocumentTemplateRead(DocumentTemplateBase, BaseModel):

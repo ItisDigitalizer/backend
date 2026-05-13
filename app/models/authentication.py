@@ -12,11 +12,7 @@ from app.models.base import BaseModel
 class RefreshSession(BaseModel, table=True):
     __tablename__ = "refresh_sessions"
 
-    user_id: UUID = Field(
-        sa_column=Column(
-            ForeignKey("users.id", ondelete="CASCADE")
-        )
-    )
+    user_id: UUID = Field(sa_column=Column(ForeignKey("users.id", ondelete="CASCADE")))
 
     user: "User" = Relationship(back_populates="sessions")
 
