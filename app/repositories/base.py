@@ -92,8 +92,8 @@ class Repository(Generic[ModelType]):
         return await self.save(instance)
 
     async def fetch_one(
-            self,
-            filters: Optional[PydanticBaseModel] = None,
+        self,
+        filters: Optional[PydanticBaseModel] = None,
     ) -> ModelType | None:
         """Получение одной записи"""
         results = await self.fetch(
