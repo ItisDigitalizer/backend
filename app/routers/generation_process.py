@@ -46,7 +46,7 @@ async def get_processes(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough permissions",
             )
-        #Если user_id вообще не передан, то запрещаем просмотр
+        # Если user_id вообще не передан, то запрещаем просмотр
         elif not filters.user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -88,7 +88,7 @@ async def get_process(
 @router.patch(
     "/{process_id}",
     response_model=GenerationProcessRead,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def update_process(
     process_id: UUID,
@@ -107,11 +107,11 @@ async def update_process(
 @router.delete(
     "/{process_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def delete_process(
-        process_id: UUID,
-        service: GenerationProcessServiceDep,
+    process_id: UUID,
+    service: GenerationProcessServiceDep,
 ):
     """Удаление процесса"""
     process = await service.delete_process(process_id)

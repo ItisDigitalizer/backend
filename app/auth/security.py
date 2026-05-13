@@ -1,4 +1,4 @@
-#app/auth/security.py
+# app/auth/security.py
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -16,7 +16,6 @@ def _create_token(
     token_type: str,
     expires_delta: timedelta,
 ) -> tuple[str, TokenPayload]:
-
     now = datetime.now(timezone.utc)
 
     payload = TokenPayload(
@@ -40,9 +39,7 @@ def create_access_token(subject: str) -> str:
     token, _ = _create_token(
         subject=subject,
         token_type="access",
-        expires_delta=timedelta(
-            minutes=settings.auth.access_token_expire_minutes
-        ),
+        expires_delta=timedelta(minutes=settings.auth.access_token_expire_minutes),
     )
 
     return token
@@ -52,9 +49,7 @@ def create_refresh_token(subject: str) -> tuple[str, TokenPayload]:
     return _create_token(
         subject=subject,
         token_type="refresh",
-        expires_delta=timedelta(
-            days=settings.auth.refresh_token_expire_days
-        ),
+        expires_delta=timedelta(days=settings.auth.refresh_token_expire_days),
     )
 
 

@@ -30,8 +30,7 @@ class User(BaseModel, UserBase, table=True):
     templates: List["DocumentTemplate"] = Relationship(back_populates="user")
     processes: List["GenerationProcess"] = Relationship(back_populates="user")
     sessions: list["RefreshSession"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete"}
+        back_populates="user", sa_relationship_kwargs={"cascade": "all, delete"}
     )
 
 

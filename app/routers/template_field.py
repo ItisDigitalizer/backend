@@ -21,7 +21,7 @@ router = APIRouter(prefix="/fields", tags=["fields"])
     "/",
     response_model=TemplateFieldRead,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def create_field(
     data: TemplateFieldCreate,
@@ -62,7 +62,7 @@ async def get_field(field_id: UUID, service: TemplateFieldServiceDep):
 @router.patch(
     "/{field_id}",
     response_model=TemplateFieldRead,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def update_field(
     field_id: UUID,
@@ -81,11 +81,11 @@ async def update_field(
 @router.delete(
     "/{field_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def delete_field(
-        field_id: UUID,
-        service: TemplateFieldServiceDep,
+    field_id: UUID,
+    service: TemplateFieldServiceDep,
 ):
     """Удаление поля"""
     field = await service.delete_field(field_id)

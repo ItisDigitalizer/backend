@@ -21,8 +21,8 @@ router = APIRouter(prefix="/users", tags=["users"])
     dependencies=[Depends(require_admin)],
 )
 async def create_user(
-        user_data: UserCreate,
-        service: UserServiceDep,
+    user_data: UserCreate,
+    service: UserServiceDep,
 ):
     """Создание нового пользователя"""
     try:
@@ -50,9 +50,7 @@ async def get_users(
 
 
 @router.get(
-    "/{user_id}",
-    response_model=UserRead,
-    dependencies=[Depends(require_admin)]
+    "/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)]
 )
 async def get_user(
     user_id: UUID,
@@ -68,9 +66,7 @@ async def get_user(
 
 
 @router.patch(
-    "/{user_id}",
-    response_model=UserRead,
-    dependencies=[Depends(require_admin)]
+    "/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)]
 )
 async def update_user(
     user_id: UUID,
@@ -98,7 +94,7 @@ async def update_user(
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def delete_user(
     user_id: UUID,

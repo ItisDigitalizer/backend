@@ -9,9 +9,7 @@ class RefreshSessionRepository(Repository[RefreshSession]):
     model = RefreshSession
 
     async def revoke_session(self, jti: UUID):
-        session = await self.fetch_one(
-            RefreshSessionFilters(jti=jti)
-        )
+        session = await self.fetch_one(RefreshSessionFilters(jti=jti))
 
         if not session:
             return None
