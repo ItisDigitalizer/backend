@@ -9,6 +9,7 @@ from app.routers import (
     document_template,
     template_field,
     authentication,
+    generation,
 )
 from fastapi import APIRouter
 
@@ -34,4 +35,5 @@ api_router.include_router(generated_document.router)
 api_router.include_router(generation_process.router)
 api_router.include_router(document_template.router)
 api_router.include_router(template_field.router)
+api_router.include_router(generation.router)
 app.include_router(api_router)
