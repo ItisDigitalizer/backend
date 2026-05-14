@@ -15,12 +15,12 @@ class DocumentTemplateBase(SQLModel):
     name: str = Field(nullable=False)
     description: str
     user_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
-    file_path: str
 
 
 class DocumentTemplate(BaseModel, DocumentTemplateBase, table=True):
     __tablename__ = "document_templates"
 
+    file_path: str | None = Field(default=None, nullable=True)
     user: "User" = Relationship(back_populates="templates")
     fields: List["TemplateField"] = Relationship(back_populates="template")
     processes: List["GenerationProcess"] = Relationship(back_populates="template")

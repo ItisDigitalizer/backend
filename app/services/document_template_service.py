@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, Sequence
 from uuid import UUID
 
@@ -51,3 +52,26 @@ class DocumentTemplateService(
         self, filters: DocumentTemplateFilters, offset: int, limit: int
     ) -> Sequence[DocumentTemplate]:
         return await self.repository.fetch_with_filters(filters, offset, limit)
+
+    async def create_template_with_file(
+        self, name: str, description: str | None, docx_content: bytes, user_id: UUID
+    ) -> DocumentTemplate | None:
+        """Полное создание: БД + файл + путь"""
+
+        # 1. Создаём шаблон (UUID генерится)
+        data = DocumentTemplateCreate(
+            name=name, description=description, user_id=user_id
+        )
+        template = await self.create_template(data)
+
+        # 2. UUID → файл
+        filename = f"{template.id}.docx"
+        path = Path("templates/raw") / filename
+        path.parent.mkdir(exist_ok=True)
+
+        with open(path, "wb") as f:
+            f.write(docx_content)
+
+        # 3. Обновляем путь
+        update_data = DocumentTemplateUpdate(file_path=f"templates/raw/{filename}")
+        return await self.update_template(template.id, update_data)
