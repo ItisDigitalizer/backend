@@ -1,7 +1,10 @@
+import io
+import zipfile
+from pathlib import Path
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from loguru import logger
 
 from app.auth.utils import get_current_user
@@ -12,7 +15,6 @@ from app.dependencies import (
     GenerationProcessServiceDep,
 )
 from app.models import User
-from app.models.generated_document import GeneratedDocumentCreate
 from app.models.generation_process import GenerationProcessCreate
 
 router = APIRouter(prefix="/generate", tags=["generation"])
@@ -34,6 +36,8 @@ async def generate_from_excel(
     template = await template_service.get(template_id)
     if not template:
         raise HTTPException(status_code=404, detail="Шаблон не найден")
+    if not template.file_path:
+        raise HTTPException(500, "У шаблона нет файла")
 
     # 2. Читаем Excel
     if not excel_file.filename.endswith((".xlsx", ".xls")):
@@ -50,16 +54,17 @@ async def generate_from_excel(
 
     # 4. Генерируем
     result_path = await generator.generate_documents(
+        doc_service,
         template.file_path,  # ← из БД!
         data_list,
         str(process.id),
     )
 
-    # 5. Сохраняем документ
-    doc = await doc_service.create_document(
-        GeneratedDocumentCreate(gen_process_id=process.id, file_path=result_path)
-    )
-    logger.info(f"Создали документ {doc.id} для процесса {process.id}")
+    # # 5. Сохраняем документ
+    # doc = await doc_service.create_document(
+    #     GeneratedDocumentCreate(gen_process_id=process.id, file_path=result_path)
+    # )
+    logger.info(f"Создали документы {result_path} для процесса {process.id}")
     return {
         "process_id": str(process.id),
         "download": f"/generate/download/{process.id}/",
@@ -69,17 +74,30 @@ async def generate_from_excel(
 
 @router.get("/download/{process_id}/")
 async def download_result(process_id: UUID, doc_service: GeneratedDocumentServiceDep):
-    docs = await doc_service.get_by_process_id(process_id, 0, 1)
+    docs = await doc_service.get_by_process_id(process_id, 0, 100)
     if not docs:
         raise HTTPException(404, "Процесс не найден")
 
-    doc = docs[0]
-    filename = "documents.zip" if ".zip" in doc.file_path else "document.docx"
+    if len(docs) == 1:
+        doc = docs[0]
+        filename = Path(doc.file_path).name
+        return FileResponse(
+            path=doc.file_path,
+            filename=filename,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for doc in docs:
+            if Path(doc.file_path).exists():
+                zipf.write(doc.file_path, Path(doc.file_path).name)
 
-    return FileResponse(
-        path=doc.file_path,
-        filename=filename,
-        media_type="application/zip"
-        if ".zip" in doc.file_path
-        else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    zip_buffer.seek(0)
+
+    return Response(
+        content=zip_buffer.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename=documents_{process_id}.zip"
+        },
     )

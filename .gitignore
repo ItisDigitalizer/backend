@@ -210,3 +210,7 @@ __marimo__/
 
 # Fastapi
 openapi.json
+
+
+# templates
+templates/

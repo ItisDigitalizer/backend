@@ -1,10 +1,12 @@
-from docx import Document
-import pandas as pd
-import zipfile
 import io
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
+
+import pandas as pd
+from docx import Document
 from loguru import logger
+from app.services.generated_document_service import GeneratedDocumentService
+from app.models.generated_document import GeneratedDocumentCreate
 
 
 class DocumentGeneratorService:
@@ -40,26 +42,43 @@ class DocumentGeneratorService:
 
     async def generate_documents(
         self,
+        generated_doc_service: GeneratedDocumentService,
         template_path: str,
         data_list: List[Dict],
-        process_id: str,  # для GenerationProcess.id
-    ) -> str:
-        """Генерирует документы/ZIP → возвращает путь для скачивания"""
+        process_id: str,
+    ) -> List[str]:
         output_dir = self.OUTPUT_DIR / process_id
         output_dir.mkdir(exist_ok=True)
 
-        if len(data_list) == 1:
-            output_path = output_dir / "document.docx"
-            self.fill_docx_template(template_path, data_list[0], str(output_path))
-            logger.info(f"Создан 1 документ: {output_path}")
-            return str(output_path)
-        else:
-            zip_path = output_dir / "documents.zip"
-            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for i, data in enumerate(data_list):
-                    temp_path = output_dir / f"temp_{i + 1}.docx"
-                    self.fill_docx_template(template_path, data, str(temp_path))
-                    zipf.write(temp_path, f"document_{i + 1}.docx")
-                    temp_path.unlink()
-            logger.info(f"Создан ZIP: {zip_path} ({len(data_list)} файлов)")
-            return str(zip_path)
+        generated_paths = []
+
+        for i, data in enumerate(data_list):
+            # Сначала создаём запись в БД (без file_path)
+            doc_record = await generated_doc_service.create(
+                GeneratedDocumentCreate(
+                    gen_process_id=process_id,
+                    file_path="",  # временно
+                )
+            )
+
+            # Имя файла = id из БД
+            filename = f"{doc_record.id}.docx"
+            output_path = output_dir / filename
+
+            # Генерируем документ
+            self.fill_docx_template(template_path, data, str(output_path))
+
+            # Обновляем запись с реальным путём
+            doc_record.file_path = str(output_path)
+            await generated_doc_service.update(doc_record.id, doc_record)
+
+            generated_paths.append(str(output_path))
+            logger.info(f"Создан документ: {output_path} (id={doc_record.id})")
+
+        return generated_paths
+
+    async def zip_documents(self, documents: List[str]) -> None:
+        pass
+
+    async def convert_to_pdf(self, docx) -> None:
+        pass
