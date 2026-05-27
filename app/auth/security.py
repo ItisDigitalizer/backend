@@ -1,9 +1,8 @@
-# app/auth/security.py
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 
 from app.core.settings import settings
 from app.schemas.authentication import TokenPayload

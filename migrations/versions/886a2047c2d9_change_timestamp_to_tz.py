@@ -8,9 +8,8 @@ Create Date: 2026-04-24 20:34:43.900522
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "886a2047c2d9"
@@ -24,29 +23,17 @@ def upgrade():
     op.alter_column("users", "created_at", type_=sa.DateTime(timezone=True))
     op.alter_column("users", "updated_at", type_=sa.DateTime(timezone=True))
 
-    op.alter_column(
-        "document_templates", "created_at", type_=sa.DateTime(timezone=True)
-    )
-    op.alter_column(
-        "document_templates", "updated_at", type_=sa.DateTime(timezone=True)
-    )
+    op.alter_column("document_templates", "created_at", type_=sa.DateTime(timezone=True))
+    op.alter_column("document_templates", "updated_at", type_=sa.DateTime(timezone=True))
 
     op.alter_column("template_fields", "created_at", type_=sa.DateTime(timezone=True))
     op.alter_column("template_fields", "updated_at", type_=sa.DateTime(timezone=True))
 
-    op.alter_column(
-        "generation_processes", "created_at", type_=sa.DateTime(timezone=True)
-    )
-    op.alter_column(
-        "generation_processes", "updated_at", type_=sa.DateTime(timezone=True)
-    )
+    op.alter_column("generation_processes", "created_at", type_=sa.DateTime(timezone=True))
+    op.alter_column("generation_processes", "updated_at", type_=sa.DateTime(timezone=True))
 
-    op.alter_column(
-        "generated_documents", "created_at", type_=sa.DateTime(timezone=True)
-    )
-    op.alter_column(
-        "generated_documents", "updated_at", type_=sa.DateTime(timezone=True)
-    )
+    op.alter_column("generated_documents", "created_at", type_=sa.DateTime(timezone=True))
+    op.alter_column("generated_documents", "updated_at", type_=sa.DateTime(timezone=True))
 
 
 def downgrade():
@@ -54,26 +41,14 @@ def downgrade():
     op.alter_column("users", "created_at", type_=sa.DateTime(timezone=False))
     op.alter_column("users", "updated_at", type_=sa.DateTime(timezone=False))
 
-    op.alter_column(
-        "document_templates", "created_at", type_=sa.DateTime(timezone=False)
-    )
-    op.alter_column(
-        "document_templates", "updated_at", type_=sa.DateTime(timezone=False)
-    )
+    op.alter_column("document_templates", "created_at", type_=sa.DateTime(timezone=False))
+    op.alter_column("document_templates", "updated_at", type_=sa.DateTime(timezone=False))
 
     op.alter_column("template_fields", "created_at", type_=sa.DateTime(timezone=False))
     op.alter_column("template_fields", "updated_at", type_=sa.DateTime(timezone=False))
 
-    op.alter_column(
-        "generation_processes", "created_at", type_=sa.DateTime(timezone=False)
-    )
-    op.alter_column(
-        "generation_processes", "updated_at", type_=sa.DateTime(timezone=False)
-    )
+    op.alter_column("generation_processes", "created_at", type_=sa.DateTime(timezone=False))
+    op.alter_column("generation_processes", "updated_at", type_=sa.DateTime(timezone=False))
 
-    op.alter_column(
-        "generated_documents", "created_at", type_=sa.DateTime(timezone=False)
-    )
-    op.alter_column(
-        "generated_documents", "updated_at", type_=sa.DateTime(timezone=False)
-    )
+    op.alter_column("generated_documents", "created_at", type_=sa.DateTime(timezone=False))
+    op.alter_column("generated_documents", "updated_at", type_=sa.DateTime(timezone=False))

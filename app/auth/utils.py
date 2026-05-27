@@ -1,4 +1,3 @@
-# app/auth/utils.py
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status

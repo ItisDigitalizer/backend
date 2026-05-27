@@ -37,3 +37,12 @@ dev = [
     "types-requests>=2.33.0.20260327",
     "pytest>=9.0.2",
 ]
+
+[tool.ruff]
+line-length = 130
+lint.select = ["E", "F", "I"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+explicit_package_bases = true
+namespace_packages = true

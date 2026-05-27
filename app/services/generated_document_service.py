@@ -14,29 +14,21 @@ from app.schemas.generated_document import GeneratedDocumentFilters
 from app.services.base import BaseService
 
 
-class GeneratedDocumentService(
-    BaseService[GeneratedDocument, GeneratedDocumentRepository]
-):
+class GeneratedDocumentService(BaseService[GeneratedDocument, GeneratedDocumentRepository]):
     def __init__(
         self,
         repository: GeneratedDocumentRepository = Depends(GeneratedDocumentRepository),
     ):
         super().__init__(repository)
 
-    async def create_document(
-        self, document_data: GeneratedDocumentCreate
-    ) -> GeneratedDocument:
+    async def create_document(self, document_data: GeneratedDocumentCreate) -> GeneratedDocument:
         logger.info(f"Creating document for process: {document_data.gen_process_id}")
         return await self.create(document_data)
 
-    async def get_by_process_id(
-        self, gen_process_id: UUID, offset, skip
-    ) -> Sequence[GeneratedDocument]:
+    async def get_by_process_id(self, gen_process_id: UUID, offset, skip) -> Sequence[GeneratedDocument]:
         return await self.repository.get_by_process_id(gen_process_id, offset, skip)
 
-    async def update_document(
-        self, document_id: UUID, updates: GeneratedDocumentUpdate
-    ) -> Optional[GeneratedDocument]:
+    async def update_document(self, document_id: UUID, updates: GeneratedDocumentUpdate) -> Optional[GeneratedDocument]:
         document = await self.get(document_id)
         if not document:
             return None

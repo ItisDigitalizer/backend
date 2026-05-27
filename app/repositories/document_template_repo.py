@@ -1,7 +1,6 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-
 from app.models.document_template import DocumentTemplate
 from app.repositories.base import Repository
 from app.schemas.document_template import DocumentTemplateFilters
@@ -19,7 +18,5 @@ class DocumentTemplateRepository(Repository[DocumentTemplate]):
         result = await self.fetch(filters)
         return result[0] if result else None
 
-    async def fetch_with_filters(
-        self, filters: DocumentTemplateFilters, offset: int, limit: int
-    ) -> Sequence[DocumentTemplate]:
+    async def fetch_with_filters(self, filters: DocumentTemplateFilters, offset: int, limit: int) -> Sequence[DocumentTemplate]:
         return await self.fetch(filters, offset, limit)

@@ -17,8 +17,8 @@ from app.repositories.user_repo import UserRepository
 from app.schemas.authentication import (
     LogoutResponse,
     RefreshSessionFilters,
-    TokenResponse,
     TokenPayload,
+    TokenResponse,
 )
 from app.services.base import BaseService
 from app.services.user_service import UserService
@@ -75,9 +75,7 @@ class AuthService(BaseService[User, UserRepository]):
             payload = decode_refresh_token(refresh_token)
             token_payload = TokenPayload(**payload)
 
-            session = await self.refresh_session_repository.fetch_one(
-                RefreshSessionFilters(jti=token_payload.jti)
-            )
+            session = await self.refresh_session_repository.fetch_one(RefreshSessionFilters(jti=token_payload.jti))
 
             if not session:
                 raise HTTPException(
@@ -119,9 +117,7 @@ class AuthService(BaseService[User, UserRepository]):
                 payload = decode_refresh_token(refresh_token)
                 token_payload = TokenPayload(**payload)
 
-                session = await self.refresh_session_repository.fetch_one(
-                    RefreshSessionFilters(jti=token_payload.jti)
-                )
+                session = await self.refresh_session_repository.fetch_one(RefreshSessionFilters(jti=token_payload.jti))
 
                 if session:
                     await self.refresh_session_repository.delete(session.id)
