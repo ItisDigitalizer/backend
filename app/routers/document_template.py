@@ -5,7 +5,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from fastapi.params import Depends
 
 from app.auth.utils import require_admin
-from app.dependencies import DocumentTemplateServiceDep
+from app.dependencies import DocumentGeneratorServiceDep, DocumentTemplateServiceDep
 from app.models.document_template import (
     DocumentTemplateRead,
     DocumentTemplateUpdate,
@@ -85,6 +85,24 @@ async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
             status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"
         )
     return template
+
+
+@router.get("/pdf/{template_id}")
+async def get_pdf_template(
+    template_id: UUID,
+    template_service: DocumentTemplateServiceDep,
+    gen_service: DocumentGeneratorServiceDep,
+):
+    template = await template_service.get(template_id)
+    if not template:
+        raise HTTPException(404, "Template not found")
+
+    if not template.file_path:
+        raise HTTPException(400, "Template file path is missing")
+
+    pdf_path = gen_service.convert_to_pdf_sync(template.file_path)
+
+    return {"pdf_path": pdf_path}
 
 
 @router.patch(

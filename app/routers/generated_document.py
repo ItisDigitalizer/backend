@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
-from app.dependencies import GeneratedDocumentServiceDep
+from app.dependencies import DocumentGeneratorServiceDep, GeneratedDocumentServiceDep
 from app.models.generated_document import (
     GeneratedDocumentCreate,
     GeneratedDocumentRead,
@@ -41,6 +41,26 @@ async def get_documents(
     return await service.get_filtered_document(
         filters, pagination.offset, pagination.limit
     )
+
+
+@router.get("/pdf")
+async def get_pdf_document(
+    doc_service: GeneratedDocumentServiceDep,
+    gen_service: DocumentGeneratorServiceDep,
+    gen_process_id: UUID,
+):
+    filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
+    docs = await doc_service.get_filtered_document(filters, 0, 1)
+    doc = docs[0]
+    if not doc:
+        raise HTTPException(404, "Document not found")
+
+    if not doc.file_path:
+        raise HTTPException(400, "Document file path is missing")
+
+    pdf_path = gen_service.convert_to_pdf_sync(doc.file_path)
+
+    return {"pdf_path": pdf_path}
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)

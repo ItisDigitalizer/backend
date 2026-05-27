@@ -3,15 +3,19 @@ from pathlib import Path
 from typing import Dict, List
 
 import pandas as pd
+import pythoncom
+import win32com.client
 from docx import Document
 from loguru import logger
-from app.services.generated_document_service import GeneratedDocumentService
+
 from app.models.generated_document import GeneratedDocumentCreate
+from app.services.generated_document_service import GeneratedDocumentService
 
 
 class DocumentGeneratorService:
     OUTPUT_DIR = Path.cwd() / "templates/output"
     OUTPUT_DIR.mkdir(exist_ok=True)
+    PDF_DIR = Path.cwd() / "templates/pdf"
 
     def excel_to_dicts(self, excel_content: bytes) -> List[Dict]:
         """Excel bytes → list[dict]"""
@@ -77,8 +81,28 @@ class DocumentGeneratorService:
 
         return generated_paths
 
-    async def zip_documents(self, documents: List[str]) -> None:
-        pass
+    def convert_to_pdf_sync(self, input_path: str) -> str:
+        input_path_obj = Path(input_path).resolve()
+        output_path = self.PDF_DIR / f"{input_path_obj.stem}.pdf"
+        output_path = output_path.resolve()
+        self.PDF_DIR.mkdir(exist_ok=True)
 
-    async def convert_to_pdf(self, docx) -> None:
-        pass
+        pythoncom.CoInitialize()
+        try:
+            word = win32com.client.Dispatch("Word.Application")
+            word.Visible = False
+            word.DisplayAlerts = False
+
+            try:
+                doc = word.Documents.Open(
+                    str(input_path_obj), ReadOnly=True, AddToRecentFiles=False
+                )
+                doc.SaveAs(str(output_path), FileFormat=17)
+                doc.Close()
+                logger.info(f"PDF создан: {output_path}")
+            finally:
+                word.Quit()
+        finally:
+            pythoncom.CoUninitialize()
+
+        return str(output_path)
