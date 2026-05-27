@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.authentication import RefreshSession
     from app.models.document_template import DocumentTemplate
     from app.models.generation_process import GenerationProcess
+    from app.models.authentication import RefreshSession
 
 
 class UserRole(str, Enum):
