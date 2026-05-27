@@ -9,6 +9,7 @@ from app.services.auth_service import AuthService
 from app.services.document_template_service import DocumentTemplateService
 from app.services.generated_document_service import GeneratedDocumentService
 from app.services.generation_process_service import GenerationProcessService
+from app.services.document_generator_service import DocumentGeneratorService
 from app.services.template_field_service import TemplateFieldService
 from app.services.user_service import UserService
 
@@ -34,4 +35,7 @@ AuthServiceDep = Annotated[AuthService, Depends(AuthService)]
 
 GenerationProcessFiltersDep = Annotated[
     GenerationProcessFilters, Depends(GenerationProcessFilters)
+]
+DocumentGeneratorServiceDep = Annotated[
+    DocumentGeneratorService, Depends(DocumentGeneratorService)
 ]
