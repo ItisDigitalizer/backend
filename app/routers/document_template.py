@@ -16,26 +16,6 @@ from app.schemas.pagination import PaginationParam
 router = APIRouter(prefix="/templates", tags=["templates"])
 
 
-# @router.post(
-#     "/",
-#     response_model=DocumentTemplateRead,
-#     status_code=status.HTTP_201_CREATED,
-#     dependencies=[Depends(require_admin)],
-# )
-# async def create_template(
-#     data: DocumentTemplateCreate,
-#     service: DocumentTemplateServiceDep,
-# ):
-#     """Создание нового шаблона"""
-#     try:
-#         return await service.create_template(data)
-#     except ValueError as e:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=str(e),
-#         )
-
-
 @router.post("/", response_model=DocumentTemplateRead, status_code=201)
 async def create_template(
     *,
@@ -71,9 +51,7 @@ async def get_templates(
 ):
     """Получение списка шаблонов с фильтрацией"""
     filters = DocumentTemplateFilters(user_id=user_id, name=name)
-    return await service.get_filtered_templates(
-        filters, pagination.offset, pagination.limit
-    )
+    return await service.get_filtered_templates(filters, pagination.offset, pagination.limit)
 
 
 @router.get("/{template_id}", response_model=DocumentTemplateRead)
@@ -81,9 +59,7 @@ async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
     """Получение шаблона по ID"""
     template = await service.get(template_id)
     if not template:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
     return template
 
 
@@ -118,9 +94,7 @@ async def update_template(
     """Обновление шаблона"""
     template = await service.update_template(template_id, updates)
     if not template:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
     return template
 
 
@@ -136,7 +110,5 @@ async def delete_template(
     """Удаление шаблона"""
     template = await service.delete_template(template_id)
     if not template:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Template not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
     return None

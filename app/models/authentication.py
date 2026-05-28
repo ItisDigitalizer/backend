@@ -5,8 +5,8 @@ from uuid import UUID
 from sqlalchemy import TIMESTAMP, Column, ForeignKey
 from sqlmodel import Field, Relationship
 
-from app.models import User
 from app.models.base import BaseModel
+from app.models.user import User
 
 
 class RefreshSession(BaseModel, table=True):

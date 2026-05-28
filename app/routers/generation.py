@@ -16,6 +16,7 @@ from app.dependencies import (
 )
 from app.models import User
 from app.models.generation_process import GenerationProcessCreate
+from app.schemas.generation import GenerateResponse
 
 router = APIRouter(prefix="/generate", tags=["generation"])
 
@@ -48,9 +49,7 @@ async def generate_from_excel(
         raise HTTPException(400, "Excel пуст")
 
     # 3. Создаём процесс
-    process = await process_service.create_process(
-        GenerationProcessCreate(user_id=current_user.id, template_id=template_id)
-    )
+    process = await process_service.create_process(GenerationProcessCreate(user_id=current_user.id, template_id=template_id))
 
     # 4. Генерируем
     result_path = await generator.generate_documents(
@@ -60,16 +59,12 @@ async def generate_from_excel(
         str(process.id),
     )
 
-    # # 5. Сохраняем документ
-    # doc = await doc_service.create_document(
-    #     GeneratedDocumentCreate(gen_process_id=process.id, file_path=result_path)
-    # )
     logger.info(f"Создали документы {result_path} для процесса {process.id}")
-    return {
-        "process_id": str(process.id),
-        "download": f"/generate/download/{process.id}/",
-        "files": len(data_list),
-    }
+    return GenerateResponse(
+        process_id=str(process.id),
+        download=f"/generate/download/{process.id}/",
+        files=len(data_list),
+    )
 
 
 @router.get("/download/{process_id}/")
@@ -97,7 +92,5 @@ async def download_result(process_id: UUID, doc_service: GeneratedDocumentServic
     return Response(
         content=zip_buffer.getvalue(),
         media_type="application/zip",
-        headers={
-            "Content-Disposition": f"attachment; filename=documents_{process_id}.zip"
-        },
+        headers={"Content-Disposition": f"attachment; filename=documents_{process_id}.zip"},
     )
