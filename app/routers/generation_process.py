@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 
 from app.auth.utils import get_current_user, require_admin
-from app.dependencies import GenerationProcessServiceDep, GenerationProcessFiltersDep
+from app.dependencies import GenerationProcessFiltersDep, GenerationProcessServiceDep
 from app.models import User, UserRole
 from app.models.generation_process import (
     GenerationProcessCreate,
@@ -17,12 +17,8 @@ from app.schemas.pagination import PaginationParam
 router = APIRouter(prefix="/processes", tags=["processes"])
 
 
-@router.post(
-    "/", response_model=GenerationProcessRead, status_code=status.HTTP_201_CREATED
-)
-async def create_process(
-    data: GenerationProcessCreate, service: GenerationProcessServiceDep
-):
+@router.post("/", response_model=GenerationProcessRead, status_code=status.HTTP_201_CREATED)
+async def create_process(data: GenerationProcessCreate, service: GenerationProcessServiceDep):
     """Создание нового процесса генерации"""
     try:
         process = await service.create_process(data)
@@ -46,7 +42,7 @@ async def get_processes(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough permissions",
             )
-        #Если user_id вообще не передан, то запрещаем просмотр
+        # Если user_id вообще не передан, то запрещаем просмотр
         elif not filters.user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -71,9 +67,7 @@ async def get_process(
     """Получение процесса по ID с проверкой прав"""
     process = await service.get(process_id)
     if not process:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Process not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Process not found")
 
     # Проверка, не пытается ли человек без админки посмотреть не свой процесс
     if current_user.role != UserRole.MANAGER and process.user_id != current_user.id:
@@ -88,7 +82,7 @@ async def get_process(
 @router.patch(
     "/{process_id}",
     response_model=GenerationProcessRead,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def update_process(
     process_id: UUID,
@@ -98,25 +92,21 @@ async def update_process(
     """Обновление процесса"""
     process = await service.update_process(process_id, updates)
     if not process:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Process not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Process not found")
     return process
 
 
 @router.delete(
     "/{process_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(require_admin)]
+    dependencies=[Depends(require_admin)],
 )
 async def delete_process(
-        process_id: UUID,
-        service: GenerationProcessServiceDep,
+    process_id: UUID,
+    service: GenerationProcessServiceDep,
 ):
     """Удаление процесса"""
     process = await service.delete_process(process_id)
     if not process:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Process not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Process not found")
     return None

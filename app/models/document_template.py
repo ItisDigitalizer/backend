@@ -15,12 +15,12 @@ class DocumentTemplateBase(SQLModel):
     name: str = Field(nullable=False)
     description: str
     user_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
-    file_path: int
 
 
 class DocumentTemplate(BaseModel, DocumentTemplateBase, table=True):
     __tablename__ = "document_templates"
 
+    file_path: str | None = Field(default=None, nullable=True)
     user: "User" = Relationship(back_populates="templates")
     fields: List["TemplateField"] = Relationship(back_populates="template")
     processes: List["GenerationProcess"] = Relationship(back_populates="template")
@@ -33,7 +33,7 @@ class DocumentTemplateCreate(DocumentTemplateBase):
 class DocumentTemplateUpdate(SQLModel):
     name: str | None = None
     description: str | None = None
-    file_path: int | None = None
+    file_path: str | None = None
 
 
 class DocumentTemplateRead(DocumentTemplateBase, BaseModel):

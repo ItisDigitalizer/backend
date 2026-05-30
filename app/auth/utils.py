@@ -1,11 +1,10 @@
-#app/auth/utils.py
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 
 from app.auth.security import (
-    oauth2_scheme,
     decode_access_token,
+    oauth2_scheme,
 )
 from app.models import User, UserRole
 from app.repositories.user_repo import UserRepository

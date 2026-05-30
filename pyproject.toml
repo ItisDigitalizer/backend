@@ -19,8 +19,11 @@ dependencies = [
     "python-multipart>=0.0.22",
     "sqlmodel>=0.0.38",
     "sqlalchemy>=2.0.0",
-    "pwdlib>=0.3.0",
+    "pwdlib[argon2]>=0.3.0",
     "python-jose>=3.5.0",
+    "pandas>=3.0.3",
+    "docx2pdf>=0.1.8",
+    "dxpdf>=0.2.25",
 ]
 
 [dependency-groups]
@@ -35,3 +38,12 @@ dev = [
     "types-requests>=2.33.0.20260327",
     "pytest>=9.0.2",
 ]
+
+[tool.ruff]
+line-length = 130
+lint.select = ["E", "F", "I"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+explicit_package_bases = true
+namespace_packages = true

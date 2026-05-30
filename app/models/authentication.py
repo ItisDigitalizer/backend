@@ -2,21 +2,17 @@ import uuid
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import Column, ForeignKey, TIMESTAMP
+from sqlalchemy import TIMESTAMP, Column, ForeignKey
 from sqlmodel import Field, Relationship
 
-from app.models import User
 from app.models.base import BaseModel
+from app.models.user import User
 
 
 class RefreshSession(BaseModel, table=True):
     __tablename__ = "refresh_sessions"
 
-    user_id: UUID = Field(
-        sa_column=Column(
-            ForeignKey("users.id", ondelete="CASCADE")
-        )
-    )
+    user_id: UUID = Field(sa_column=Column(ForeignKey("users.id", ondelete="CASCADE")))
 
     user: "User" = Relationship(back_populates="sessions")
 
