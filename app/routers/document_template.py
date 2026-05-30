@@ -12,6 +12,7 @@ from app.models.document_template import (
 )
 from app.schemas.document_template import DocumentTemplateFilters
 from app.schemas.pagination import PaginationParam
+from app.schemas.pdf_response import PdfResponse
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -78,7 +79,7 @@ async def get_pdf_template(
 
     pdf_path = gen_service.convert_to_pdf_sync(template.file_path)
 
-    return {"pdf_path": pdf_path}
+    return PdfResponse(pdf_path=pdf_path)
 
 
 @router.patch(

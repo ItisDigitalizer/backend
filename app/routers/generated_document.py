@@ -12,16 +12,13 @@ from app.models.generated_document import (
 )
 from app.schemas.generated_document import GeneratedDocumentFilters
 from app.schemas.pagination import PaginationParam
+from app.schemas.pdf_response import PdfResponse
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
-@router.post(
-    "/", response_model=GeneratedDocumentRead, status_code=status.HTTP_201_CREATED
-)
-async def create_document(
-    document_data: GeneratedDocumentCreate, service: GeneratedDocumentServiceDep
-):
+@router.post("/", response_model=GeneratedDocumentRead, status_code=status.HTTP_201_CREATED)
+async def create_document(document_data: GeneratedDocumentCreate, service: GeneratedDocumentServiceDep):
     """Создание нового документа"""
     try:
         document = await service.create_document(document_data)
@@ -38,9 +35,7 @@ async def get_documents(
 ):
     """Получение списка документов с фильтрацией по процессу"""
     filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
-    return await service.get_filtered_document(
-        filters, pagination.offset, pagination.limit
-    )
+    return await service.get_filtered_document(filters, pagination.offset, pagination.limit)
 
 
 @router.get("/pdf")
@@ -48,9 +43,9 @@ async def get_pdf_document(
     doc_service: GeneratedDocumentServiceDep,
     gen_service: DocumentGeneratorServiceDep,
     gen_process_id: UUID,
+    filter: GeneratedDocumentFilters = Depends(),
 ):
-    filters = GeneratedDocumentFilters(gen_process_id=gen_process_id)
-    docs = await doc_service.get_filtered_document(filters, 0, 1)
+    docs = await doc_service.get_filtered_document(filters=filter, offset=0, limit=1)
     doc = docs[0]
     if not doc:
         raise HTTPException(404, "Document not found")
@@ -60,7 +55,7 @@ async def get_pdf_document(
 
     pdf_path = gen_service.convert_to_pdf_sync(doc.file_path)
 
-    return {"pdf_path": pdf_path}
+    return PdfResponse(pdf_path=pdf_path)
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)
@@ -68,9 +63,7 @@ async def get_document(document_id: UUID, service: GeneratedDocumentServiceDep):
     """Получение документа по ID"""
     document = await service.get(document_id)
     if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     return document
 
 
@@ -83,9 +76,7 @@ async def update_document(
     """Обновление документа"""
     document = await service.update_document(document_id, updates)
     if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     return document
 
 
@@ -94,16 +85,12 @@ async def delete_document(document_id: UUID, service: GeneratedDocumentServiceDe
     """Удаление документа"""
     document = await service.delete_document(document_id)
     if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Document not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     return None
 
 
 @router.delete("/{gen_process_id}/documents", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_documents_by_process(
-    gen_process_id: UUID, service: GeneratedDocumentServiceDep
-):
+async def delete_documents_by_process(gen_process_id: UUID, service: GeneratedDocumentServiceDep):
     """Удаление всех документов процесса"""
     deleted_count = await service.delete_by_process_id(gen_process_id)
     if deleted_count == 0:
