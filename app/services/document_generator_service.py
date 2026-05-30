@@ -2,9 +2,8 @@ import io
 from pathlib import Path
 from typing import Dict, List
 
+import dxpdf
 import pandas as pd
-import pythoncom
-import win32com.client
 from docx import Document
 from loguru import logger
 
@@ -82,27 +81,15 @@ class DocumentGeneratorService:
         return generated_paths
 
     def convert_to_pdf_sync(self, input_path: str) -> str:
+        """Синхронно конвертирует DOCX в PDF через dxpdf."""
         input_path_obj = Path(input_path).resolve()
         output_path = self.PDF_DIR / f"{input_path_obj.stem}.pdf"
-        output_path = output_path.resolve()
-        self.PDF_DIR.mkdir(exist_ok=True)
 
-        pythoncom.CoInitialize()
-        try:
-            word = win32com.client.Dispatch("Word.Application")
-            word.Visible = False
-            word.DisplayAlerts = False
+        # Убедимся, что папка для PDF существует
+        self.PDF_DIR.mkdir(parents=True, exist_ok=True)
 
-            try:
-                doc = word.Documents.Open(
-                    str(input_path_obj), ReadOnly=True, AddToRecentFiles=False
-                )
-                doc.SaveAs(str(output_path), FileFormat=17)
-                doc.Close()
-                logger.info(f"PDF создан: {output_path}")
-            finally:
-                word.Quit()
-        finally:
-            pythoncom.CoUninitialize()
+        # Конвертируем
+        dxpdf.convert_file(str(input_path_obj), str(output_path))
 
+        logger.info(f"PDF создан с помощью dxpdf: {output_path}")
         return str(output_path)
