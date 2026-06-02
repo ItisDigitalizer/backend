@@ -15,9 +15,7 @@ from app.services.base import BaseService
 
 
 class TemplateFieldService(BaseService[TemplateField, TemplateFieldRepository]):
-    def __init__(
-        self, repository: TemplateFieldRepository = Depends(TemplateFieldRepository)
-    ):
+    def __init__(self, repository: TemplateFieldRepository = Depends(TemplateFieldRepository)):
         super().__init__(repository)
 
     async def create_field(self, data: TemplateFieldCreate) -> TemplateField:
@@ -27,9 +25,7 @@ class TemplateFieldService(BaseService[TemplateField, TemplateFieldRepository]):
     async def get_by_template_id(self, template_id: UUID) -> Sequence[TemplateField]:
         return await self.repository.get_by_template_id(template_id)
 
-    async def update_field(
-        self, field_id: UUID, updates: TemplateFieldUpdate
-    ) -> TemplateField | None:
+    async def update_field(self, field_id: UUID, updates: TemplateFieldUpdate) -> TemplateField | None:
         field = await self.get(field_id)
         if not field:
             return None
@@ -38,7 +34,5 @@ class TemplateFieldService(BaseService[TemplateField, TemplateFieldRepository]):
     async def delete_field(self, field_id: UUID) -> Optional[TemplateField]:
         return await self.repository.delete(field_id)
 
-    async def get_filtered_field(
-        self, filters: TemplateFieldFilters, offset: int, limit: int
-    ) -> Sequence[TemplateField]:
+    async def get_filtered_field(self, filters: TemplateFieldFilters, offset: int, limit: int) -> Sequence[TemplateField]:
         return await self.repository.fetch_with_filters(filters, offset, limit)

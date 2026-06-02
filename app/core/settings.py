@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,9 +21,20 @@ class AuthSettings(BaseSettings):
     refresh_token_expire_days: int
 
 
+class SMTPSettings(BaseSettings):
+    username: str
+    password: str
+    mail_from: EmailStr
+    port: int
+    server: str
+    starttls: bool = False
+    ssl_tls: bool = True
+
+
 class Settings(BaseSettings):
     db: DatabaseSettings
     auth: AuthSettings
+    smtp: SMTPSettings
 
     model_config = SettingsConfigDict(
         env_file=".env",

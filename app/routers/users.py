@@ -43,15 +43,11 @@ async def get_users(
     filters: UserFilters = Depends(),
 ):
     """Получение списка пользователей с фильтрацией"""
-    users = await service.get_filtered_users(
-        filters, pagination.offset, pagination.limit
-    )
+    users = await service.get_filtered_users(filters, pagination.offset, pagination.limit)
     return users
 
 
-@router.get(
-    "/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)]
-)
+@router.get("/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)])
 async def get_user(
     user_id: UUID,
     service: UserServiceDep,
@@ -59,15 +55,11 @@ async def get_user(
     """Получение пользователя по ID"""
     user = await service.get(user_id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 
-@router.patch(
-    "/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)]
-)
+@router.patch("/{user_id}", response_model=UserRead, dependencies=[Depends(require_admin)])
 async def update_user(
     user_id: UUID,
     updates: UserUpdate,

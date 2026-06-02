@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
 from fastapi.params import Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.utils import get_current_user
 from app.dependencies import AuthServiceDep
 from app.models.user import User, UserCreate, UserRead
-from app.schemas.authentication import LogoutResponse, TokenResponse
+from app.schemas.authentication import (
+    ChangePasswordRequest,
+    ForgotPasswordRequest,
+    LogoutResponse,
+    ResetPasswordRequest,
+    TokenResponse,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -39,8 +45,48 @@ async def me(current_user: User = Depends(get_current_user)):
 async def register(
     data: UserCreate,
     service: AuthServiceDep,
+    background_tasks: BackgroundTasks,  # Добавляем для отправки email
 ):
-    return await service.register(data)
+    # Передаем background_tasks в сервис
+    return await service.register(data, background_tasks)
+
+
+@router.get("/verify-account")
+async def verify_account(
+    token: str,
+    service: AuthServiceDep,
+):
+    """Новый роут: подтверждение аккаунта по ссылке из письма"""
+    return await service.verify_account(token)
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    data: ForgotPasswordRequest,
+    service: AuthServiceDep,
+    background_tasks: BackgroundTasks,
+):
+    """Новый роут: запрос ссылки на восстановление пароля"""
+    return await service.forgot_password(data, background_tasks)
+
+
+@router.post("/reset-password")
+async def reset_password(
+    data: ResetPasswordRequest,
+    service: AuthServiceDep,
+):
+    """Новый роут: установка нового пароля по токену"""
+    return await service.reset_password(data)
+
+
+@router.post("/change-password")
+async def change_password(
+    data: ChangePasswordRequest,
+    service: AuthServiceDep,
+    current_user: User = Depends(get_current_user),  # Роут доступен только авторизованным
+):
+    """Обычная смена пароля из личного кабинета"""
+    return await service.change_password(current_user, data)
 
 
 @router.post("/refresh", response_model=TokenResponse)
