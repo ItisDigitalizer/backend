@@ -79,3 +79,13 @@ def decode_refresh_token(token: str) -> dict:
         raise ValueError("Invalid token type")
 
     return payload
+
+
+def create_action_token(user_id: str, action: str, expires_delta: int = 30) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=expires_delta)
+    to_encode = {"sub": user_id, "action": action, "exp": expire}
+    return jwt.encode(to_encode, settings.auth.secret_key, algorithm=settings.auth.algorithm)
+
+
+def decode_action_token(token: str) -> dict:
+    return jwt.decode(token, settings.auth.secret_key, algorithms=[settings.auth.algorithm])

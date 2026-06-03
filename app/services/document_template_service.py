@@ -15,9 +15,7 @@ from app.schemas.document_template import DocumentTemplateFilters
 from app.services.base import BaseService
 
 
-class DocumentTemplateService(
-    BaseService[DocumentTemplate, DocumentTemplateRepository]
-):
+class DocumentTemplateService(BaseService[DocumentTemplate, DocumentTemplateRepository]):
     def __init__(
         self,
         repository: DocumentTemplateRepository = Depends(DocumentTemplateRepository),
@@ -37,9 +35,7 @@ class DocumentTemplateService(
     async def get_by_name(self, name: str) -> Optional[DocumentTemplate]:
         return await self.repository.get_by_name(name)
 
-    async def update_template(
-        self, template_id: UUID, updates: DocumentTemplateUpdate
-    ) -> Optional[DocumentTemplate]:
+    async def update_template(self, template_id: UUID, updates: DocumentTemplateUpdate) -> Optional[DocumentTemplate]:
         template = await self.get(template_id)
         if not template:
             return None
@@ -59,9 +55,7 @@ class DocumentTemplateService(
         """Полное создание: БД + файл + путь"""
 
         # 1. Создаём шаблон (UUID генерится)
-        data = DocumentTemplateCreate(
-            name=name, description=description, user_id=user_id
-        )
+        data = DocumentTemplateCreate(name=name, description=description, user_id=user_id)
         template = await self.create_template(data)
 
         # 2. UUID → файл

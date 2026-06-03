@@ -14,9 +14,7 @@ from app.schemas.generation_process import GenerationProcessFilters
 from app.services.base import BaseService
 
 
-class GenerationProcessService(
-    BaseService[GenerationProcess, GenerationProcessRepository]
-):
+class GenerationProcessService(BaseService[GenerationProcess, GenerationProcessRepository]):
     def __init__(
         self,
         repository: GenerationProcessRepository = Depends(GenerationProcessRepository),
@@ -30,14 +28,10 @@ class GenerationProcessService(
     async def get_by_user_id(self, user_id: UUID) -> Sequence[GenerationProcess]:
         return await self.repository.get_by_user_id(user_id)
 
-    async def get_by_template_id(
-        self, template_id: UUID
-    ) -> Sequence[GenerationProcess]:
+    async def get_by_template_id(self, template_id: UUID) -> Sequence[GenerationProcess]:
         return await self.repository.get_by_template_id(template_id)
 
-    async def update_process(
-        self, process_id: UUID, updates: GenerationProcessUpdate
-    ) -> Optional[GenerationProcess]:
+    async def update_process(self, process_id: UUID, updates: GenerationProcessUpdate) -> Optional[GenerationProcess]:
         process = await self.get(process_id)
         if not process:
             return None

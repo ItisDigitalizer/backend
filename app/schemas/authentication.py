@@ -1,9 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
-from sqlmodel import SQLModel
-
-from app.models.user import UserRole
+from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginRequest(BaseModel):
@@ -17,13 +14,18 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-class UserFilters(SQLModel):
-    username: str | None = None
-    email: str | None = None
-    role: UserRole | None = None
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str = Field(..., min_length=8)
 
-    class Config:
-        from_attributes = True
+
+class EmailNotificationResponse(BaseModel):
+    detail: str
+
+
+class ActionSuccessResponse(BaseModel):
+    success: bool
+    detail: str
 
 
 class TokenPayload(BaseModel):
@@ -42,3 +44,12 @@ class RefreshSessionFilters(BaseModel):
 class LogoutResponse(BaseModel):
     success: bool
     message: str | None = None
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=8)

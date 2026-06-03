@@ -19,7 +19,5 @@ class UserRepository(Repository[User]):
         result = await self.fetch(filters)
         return result[0] if result else None
 
-    async def fetch_with_filters(
-        self, filters: UserFilters, offset: int, limit: int
-    ) -> Sequence[User]:
+    async def fetch_with_filters(self, filters: UserFilters, offset: int, limit: int) -> Sequence[User]:
         return await self.fetch(filters, offset, limit)

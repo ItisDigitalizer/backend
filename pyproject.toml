@@ -24,6 +24,7 @@ dependencies = [
     "pandas>=3.0.3",
     "docx2pdf>=0.1.8",
     "dxpdf>=0.2.25",
+    "fastapi-mail>=1.6.4",
 ]
 
 [dependency-groups]
