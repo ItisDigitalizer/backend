@@ -25,6 +25,7 @@ dependencies = [
     "docx2pdf>=0.1.8",
     "dxpdf>=0.2.25",
     "fastapi-mail>=1.6.4",
+    "gunicorn>=26.0.0",
 ]
 
 [dependency-groups]

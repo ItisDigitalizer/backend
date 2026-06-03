@@ -1,0 +1,79 @@
+name: dig-compose
+
+x-back-image: &back-image
+  image: awfl/digitalizer-backend:latest
+
+x-back-base: &back-base
+  <<: *back-image
+  restart: on-failure
+  env_file:
+    - .env
+
+x-front-image: &front-image
+  image: nginx:alpine
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB__USER}
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+      POSTGRES_DB: ${DB__NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB__USER} -d ${DB__NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  alembic:
+    <<: *back-base
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+
+  rbac:
+    <<: *back-base
+    depends_on:
+      alembic:
+        condition: service_completed_successfully
+    command: ["python", "init.py"]
+
+  api:
+    <<: *back-base
+    restart: always
+    depends_on:
+      rbac:
+        condition: service_completed_successfully
+    environment:
+      GUNICORN_WORKERS: "4"
+      GUNICORN_TIMEOUT: "120"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  nginx:
+    <<: *front-image
+    restart: always
+    ports:
+      - "${COMMON_PORT:-80}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:

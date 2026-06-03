@@ -42,7 +42,6 @@ async def get_documents(
 async def get_pdf_document(
     doc_service: GeneratedDocumentServiceDep,
     gen_service: DocumentGeneratorServiceDep,
-    gen_process_id: UUID,
     filter: GeneratedDocumentFilters = Depends(),
 ):
     docs = await doc_service.get_filtered_document(filters=filter, offset=0, limit=1)
