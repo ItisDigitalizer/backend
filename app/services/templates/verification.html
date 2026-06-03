@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>Добро пожаловать в наше приложение!</h2>
+        <p>Спасибо за регистрацию. Для активации вашего аккаунта нажмите на кнопку ниже:</p>
+        <br>
+        <!-- Кнопка подставит токен-ссылку, которую мы генерируем в сервисе -->
+        <a href="{{ token_link }}" class="button" style="color: white;">Подтвердить аккаунт</a>
+        <br><br>
+        <p>Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:</p>
+        <p style="color: #666; font-size: 12px;">{{ token_link }}</p>
+        <hr style="border: 0; border-top: 1px solid #eee;">
+        <p style="font-size: 11px; color: #999;">Это письмо сгенерировано автоматически, отвечать на него не нужно.</p>
+    </div>
+</body>
+</html>
