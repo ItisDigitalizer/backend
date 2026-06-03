@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from fastapi.params import Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -6,7 +6,9 @@ from app.auth.utils import get_current_user
 from app.dependencies import AuthServiceDep
 from app.models.user import User, UserCreate, UserRead
 from app.schemas.authentication import (
+    ActionSuccessResponse,
     ChangePasswordRequest,
+    EmailNotificationResponse,
     ForgotPasswordRequest,
     LogoutResponse,
     ResetPasswordRequest,
@@ -41,51 +43,47 @@ async def me(current_user: User = Depends(get_current_user)):
     return UserRead.model_validate(current_user)
 
 
-@router.post("/register")
+@router.post("/register", response_model=EmailNotificationResponse)
 async def register(
     data: UserCreate,
     service: AuthServiceDep,
-    background_tasks: BackgroundTasks,  # Добавляем для отправки email
+    background_tasks: BackgroundTasks,
+    request: Request,
 ):
-    # Передаем background_tasks в сервис
-    return await service.register(data, background_tasks)
+    return await service.register(data, background_tasks, request)
 
 
-@router.get("/verify-account")
+@router.get("/verify-account", response_model=ActionSuccessResponse)
 async def verify_account(
     token: str,
     service: AuthServiceDep,
 ):
-    """Новый роут: подтверждение аккаунта по ссылке из письма"""
     return await service.verify_account(token)
 
 
-@router.post("/forgot-password")
+@router.post("/forgot-password", response_model=EmailNotificationResponse)
 async def forgot_password(
     data: ForgotPasswordRequest,
     service: AuthServiceDep,
     background_tasks: BackgroundTasks,
 ):
-    """Новый роут: запрос ссылки на восстановление пароля"""
     return await service.forgot_password(data, background_tasks)
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_model=ActionSuccessResponse)
 async def reset_password(
     data: ResetPasswordRequest,
     service: AuthServiceDep,
 ):
-    """Новый роут: установка нового пароля по токену"""
     return await service.reset_password(data)
 
 
-@router.post("/change-password")
+@router.post("/change-password", response_model=ActionSuccessResponse)
 async def change_password(
     data: ChangePasswordRequest,
     service: AuthServiceDep,
-    current_user: User = Depends(get_current_user),  # Роут доступен только авторизованным
+    current_user: User = Depends(get_current_user),
 ):
-    """Обычная смена пароля из личного кабинета"""
     return await service.change_password(current_user, data)
 
 

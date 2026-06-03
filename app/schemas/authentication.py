@@ -19,6 +19,15 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(..., min_length=8)
 
 
+class EmailNotificationResponse(BaseModel):
+    detail: str
+
+
+class ActionSuccessResponse(BaseModel):
+    success: bool
+    detail: str
+
+
 class TokenPayload(BaseModel):
     sub: str
     type: str  # "access" / "refresh"

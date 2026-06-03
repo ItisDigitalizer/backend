@@ -31,10 +31,15 @@ class SMTPSettings(BaseSettings):
     ssl_tls: bool = True
 
 
+class FrontendSettings(BaseSettings):
+    url: str
+
+
 class Settings(BaseSettings):
     db: DatabaseSettings
     auth: AuthSettings
     smtp: SMTPSettings
+    frontend: FrontendSettings
 
     model_config = SettingsConfigDict(
         env_file=".env",

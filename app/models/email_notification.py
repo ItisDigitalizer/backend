@@ -14,5 +14,4 @@ class EmailNotification(BaseModel, table=True):
     template_name: str = Field(nullable=False)
     status: str = Field(default="pending", nullable=False)  # pending, sent, failed
 
-    # Можно связать с пользователем, если необходимо:
-    user_id: uuid.UUID | None = Field(default=None, foreign_key="users.id", nullable=True)
+    user_id: uuid.UUID | None = Field(default=None, foreign_key="users.id")

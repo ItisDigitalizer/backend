@@ -24,7 +24,6 @@ async def create_user(
     user_data: UserCreate,
     service: UserServiceDep,
 ):
-    """Создание нового пользователя"""
     try:
         user = await service.create_user(user_data)
         return user
@@ -42,7 +41,6 @@ async def get_users(
     pagination: PaginationParam = Depends(),
     filters: UserFilters = Depends(),
 ):
-    """Получение списка пользователей с фильтрацией"""
     users = await service.get_filtered_users(filters, pagination.offset, pagination.limit)
     return users
 
@@ -52,7 +50,6 @@ async def get_user(
     user_id: UUID,
     service: UserServiceDep,
 ):
-    """Получение пользователя по ID"""
     user = await service.get(user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
