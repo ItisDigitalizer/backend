@@ -9,6 +9,7 @@ from app.routers import (
     generated_document,
     generation,
     generation_process,
+    health,
     template_field,
     users,
 )
@@ -36,4 +37,5 @@ api_router.include_router(generation_process.router)
 api_router.include_router(document_template.router)
 api_router.include_router(template_field.router)
 api_router.include_router(generation.router)
+app.include_router(health.router)
 app.include_router(api_router)
