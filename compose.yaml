@@ -9,6 +9,9 @@ x-back-base: &back-base
   env_file:
     - .env
 
+x-front-image: &front-image
+  image: nginx:alpine
+
 services:
   db:
     image: postgres:16-alpine
@@ -46,8 +49,9 @@ services:
     depends_on:
       rbac:
         condition: service_completed_successfully
-    expose:
-      - "8000"
+    environment:
+      GUNICORN_WORKERS: "4"
+      GUNICORN_TIMEOUT: "120"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -56,7 +60,7 @@ services:
       start_period: 5s
 
   nginx:
-    image: nginx:alpine
+    <<: *front-image
     restart: always
     ports:
       - "${COMMON_PORT:-80}:80"
