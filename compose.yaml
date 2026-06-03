@@ -1,19 +1,13 @@
 name: dig-compose
 
-x-base: &base
-  build: .
-  env_file:
-    - .env
-
 services:
   db:
     image: postgres:16-alpine
+    restart: always
     environment:
       POSTGRES_USER: ${DB__USER}
       POSTGRES_PASSWORD: ${DB__PASSWORD}
       POSTGRES_DB: ${DB__NAME}
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,30 +18,39 @@ services:
       start_period: 5s
 
   alembic:
-    <<: *base
+    image: awfl/digitalizer-backend:latest
+    restart: on-failure
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
     command: ["alembic", "upgrade", "head"]
 
   rbac:
-    <<: *base
+    image: awfl/digitalizer-backend:latest
+    restart: on-failure
+    env_file:
+      - .env
     depends_on:
       alembic:
         condition: service_completed_successfully
     command: ["python", "init.py"]
 
   api:
-    <<: *base
+    image: awfl/digitalizer-backend:latest
+    restart: always
+    env_file:
+      - .env
     depends_on:
       rbac:
         condition: service_completed_successfully
     expose:
       - "8000"
-    # порты наружу не публикуем, только через nginx
 
   nginx:
     image: nginx:alpine
+    restart: always
     ports:
       - "${COMMON_PORT:-80}:80"
     volumes:
