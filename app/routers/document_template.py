@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 from fastapi.params import Depends
+from fastapi.responses import FileResponse
 
 from app.auth.utils import require_admin
 from app.dependencies import DocumentGeneratorServiceDep, DocumentTemplateServiceDep
@@ -12,7 +13,6 @@ from app.models.document_template import (
 )
 from app.schemas.document_template import DocumentTemplateFilters
 from app.schemas.pagination import PaginationParam
-from app.schemas.pdf_response import PdfResponse
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -79,7 +79,7 @@ async def get_pdf_template(
 
     pdf_path = gen_service.convert_to_pdf_sync(template.file_path)
 
-    return PdfResponse(pdf_path=pdf_path)
+    return FileResponse(path=pdf_path, media_type="application/pdf", filename=f"{template.name}.pdf")
 
 
 @router.patch(
