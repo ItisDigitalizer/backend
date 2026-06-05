@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import List
 from uuid import UUID
 
@@ -55,7 +54,7 @@ async def get_pdf_document(
 
     pdf_path = gen_service.convert_to_pdf_sync(doc.file_path)
 
-    return FileResponse(path=pdf_path, media_type="application/pdf", filename=Path(pdf_path).name)
+    return FileResponse(path=pdf_path, media_type="application/pdf", headers={"Content-Disposition": "inline"})
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)

@@ -86,7 +86,7 @@ async def get_pdf_template(
 
     pdf_path = gen_service.convert_to_pdf_sync(template.file_path)
 
-    return FileResponse(path=pdf_path, media_type="application/pdf", filename=f"{template.name}.pdf")
+    return FileResponse(path=pdf_path, media_type="application/pdf", headers={"Content-Disposition": "inline"})
 
 
 @router.patch(
