@@ -1,4 +1,4 @@
-name: Deploy to Cloud.ru
+name: Deploy to VM
 
 on:
   push:
@@ -6,18 +6,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Log in to Artifact Registry
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ${{ secrets.CR_URI }}
-          username: ${{ secrets.CR_LOGIN }}
-          password: ${{ secrets.CR_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -25,4 +23,15 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.CR_URI }}/digitalizer-backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/digitalizer-backend:latest
+
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.VM_USER }}/digitalizer-backend
+            docker compose pull
+            docker compose up -d
