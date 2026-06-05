@@ -14,11 +14,10 @@ async def init_rbac():
     async_session = async_sessionmaker(engine, expire_on_commit=False)
 
     async with async_session() as session:
-        # Проверяем, есть ли хоть один менеджер
         result = await session.execute(select(User).where(User.role == UserRole.MANAGER))
-        manager = result.scalar_one_or_none()
+        managers = result.scalars().all()
 
-        if not manager:
+        if not managers:
             # Создаём верифицированного администратора
             admin = User(
                 username="admin",
@@ -33,7 +32,7 @@ async def init_rbac():
             print("   username: admin")
 
         else:
-            print(f"ℹАдминистратор уже существует: {manager.username} (is_verified={manager.is_verified})")
+            print(f"Уже есть {len(managers)} менеджеров")
 
     await engine.dispose()
 
