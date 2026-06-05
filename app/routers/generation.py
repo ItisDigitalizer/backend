@@ -21,7 +21,7 @@ from app.schemas.generation import GenerateResponse, ManualDataRequest
 router = APIRouter(prefix="/generate", tags=["generation"])
 
 
-@router.post("/from-excel/", status_code=201)
+@router.post("/from-excel/", status_code=201, response_model=GenerateResponse)
 async def generate_from_excel(
     template_service: DocumentTemplateServiceDep,
     generator: DocumentGeneratorServiceDep,
@@ -67,7 +67,7 @@ async def generate_from_excel(
     )
 
 
-@router.post("/manual/", status_code=201)
+@router.post("/manual/", status_code=201, response_model=GenerateResponse)
 async def generate_manual(
     template_service: DocumentTemplateServiceDep,
     generator: DocumentGeneratorServiceDep,
