@@ -2,10 +2,7 @@ from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 
-from app.auth.security import (
-    decode_access_token,
-    oauth2_scheme,
-)
+from app.auth.security import decode_access_token, oauth2_scheme, oauth2_scheme_optional
 from app.models import User, UserRole
 from app.repositories.user_repo import UserRepository
 
@@ -38,6 +35,26 @@ async def get_current_user(
             detail="Not authenticated",
         )
 
+    return user
+
+
+async def get_current_user_optional(
+    token: str | None = Depends(oauth2_scheme_optional),
+    user_repo: UserRepository = Depends(),
+) -> User | None:
+    if token is None:
+        return None
+    try:
+        payload = decode_access_token(token)
+    except ValueError:
+        return None
+
+    user_id = payload.get("sub")
+
+    if not user_id:
+        return None
+
+    user = await user_repo.get(UUID(user_id))
     return user
 
 

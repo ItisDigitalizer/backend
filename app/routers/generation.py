@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, Response
 from loguru import logger
 
-from app.auth.utils import get_current_user
+from app.auth.utils import get_current_user_optional
 from app.dependencies import (
     DocumentGeneratorServiceDep,
     DocumentTemplateServiceDep,
@@ -29,10 +29,10 @@ async def generate_from_excel(
     doc_service: GeneratedDocumentServiceDep,
     template_id: UUID = Form(...),
     excel_file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     """Excel → DOCX/ZIP"""
-
+    user_id = current_user.id if current_user else None
     # 1. Проверяем шаблон
     template = await template_service.get(template_id)
     if not template:
@@ -49,7 +49,7 @@ async def generate_from_excel(
         raise HTTPException(400, "Excel пуст")
 
     # 3. Создаём процесс
-    process = await process_service.create_process(GenerationProcessCreate(user_id=current_user.id, template_id=template_id))
+    process = await process_service.create_process(GenerationProcessCreate(user_id=user_id, template_id=template_id))
 
     # 4. Генерируем
     result_path = await generator.generate_documents(
@@ -75,7 +75,7 @@ async def generate_manual(
     doc_service: GeneratedDocumentServiceDep,
     template_id: UUID,
     request: ManualDataRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
     """Ручное заполнение — один документ"""
 
@@ -85,7 +85,9 @@ async def generate_manual(
         raise HTTPException(404, "Шаблон не найден")
 
     # 2. Создаём процесс
-    process = await process_service.create_process(GenerationProcessCreate(user_id=current_user.id, template_id=template_id))
+    process = await process_service.create_process(
+        GenerationProcessCreate(user_id=current_user.id if current_user else None, template_id=template_id)
+    )
 
     # 3. Генерируем документ (один словарь → список из одного)
     data_list = [request.data]
