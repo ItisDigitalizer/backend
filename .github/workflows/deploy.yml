@@ -33,5 +33,6 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             cd /home/${{ secrets.VM_USER }}/digitalizer-backend
+            docker compose down
             docker compose pull
             docker compose up -d
