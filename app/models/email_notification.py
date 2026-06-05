@@ -14,4 +14,4 @@ class EmailNotification(BaseModel, table=True):
     template_name: str = Field(nullable=False)
     status: str = Field(default="pending", nullable=False)  # pending, sent, failed
 
-    user_id: uuid.UUID | None = Field(default=None, foreign_key="users.id")
+    user_id: uuid.UUID | None = Field(default=None, foreign_key="users.id", ondelete="CASCADE")
