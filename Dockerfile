@@ -19,6 +19,12 @@ FROM python:3.14-slim-bookworm AS final
 # Устанавливаем необходимые системные библиотеки
 RUN apt-get update && \
     apt-get install -y --no-install-recommends curl libexpat1 && \
+        curl \
+        libexpat1 \
+        fontconfig \
+        fonts-liberation \
+        fonts-dejavu-core \
+        fonts-noto-core && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
