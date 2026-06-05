@@ -73,8 +73,8 @@ async def generate_manual(
     generator: DocumentGeneratorServiceDep,
     process_service: GenerationProcessServiceDep,
     doc_service: GeneratedDocumentServiceDep,
+    template_id: UUID,
     request: ManualDataRequest,
-    template_id: UUID = Form(...),
     current_user: User = Depends(get_current_user),
 ):
     """Ручное заполнение — один документ"""
