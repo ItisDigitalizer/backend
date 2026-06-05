@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, List
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
+from app.models.template_field import TemplateField
 
 if TYPE_CHECKING:
     from app.models.generation_process import GenerationProcess
@@ -38,3 +39,8 @@ class DocumentTemplateUpdate(SQLModel):
 
 class DocumentTemplateRead(DocumentTemplateBase, BaseModel):
     file_path: str
+
+
+class DocumentTemplateFieldRead(DocumentTemplateBase, BaseModel):
+    file_path: str
+    fields: List[TemplateField]

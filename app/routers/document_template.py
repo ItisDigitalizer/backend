@@ -6,11 +6,8 @@ from fastapi.params import Depends
 from fastapi.responses import FileResponse
 
 from app.auth.utils import require_admin
-from app.dependencies import DocumentGeneratorServiceDep, DocumentTemplateServiceDep
-from app.models.document_template import (
-    DocumentTemplateRead,
-    DocumentTemplateUpdate,
-)
+from app.dependencies import DocumentGeneratorServiceDep, DocumentTemplateServiceDep, TemplateFieldServiceDep
+from app.models.document_template import DocumentTemplateFieldRead, DocumentTemplateRead, DocumentTemplateUpdate
 from app.schemas.document_template import DocumentTemplateFilters
 from app.schemas.pagination import PaginationParam
 
@@ -55,13 +52,23 @@ async def get_templates(
     return await service.get_filtered_templates(filters, pagination.offset, pagination.limit)
 
 
-@router.get("/{template_id}", response_model=DocumentTemplateRead)
-async def get_template(template_id: UUID, service: DocumentTemplateServiceDep):
+@router.get("/{template_id}", response_model=DocumentTemplateFieldRead)
+async def get_template(template_id: UUID, template_service: DocumentTemplateServiceDep, field_service: TemplateFieldServiceDep):
     """Получение шаблона по ID"""
-    template = await service.get(template_id)
+    template = await template_service.get(template_id)
     if not template:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
-    return template
+    tempalte_fields = await field_service.get_by_template_id(template_id)
+    return DocumentTemplateFieldRead(
+        id=template.id,
+        created_at=template.created_at,
+        updated_at=template.updated_at,
+        name=template.name,
+        description=template.description,
+        user_id=template.user_id,
+        file_path=template.file_path,
+        fields=tempalte_fields,
+    )
 
 
 @router.get("/pdf/{template_id}")
