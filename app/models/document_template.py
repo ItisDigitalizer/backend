@@ -37,4 +37,4 @@ class DocumentTemplateUpdate(SQLModel):
 
 
 class DocumentTemplateRead(DocumentTemplateBase, BaseModel):
-    pass
+    file_path: str
