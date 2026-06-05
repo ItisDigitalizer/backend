@@ -18,7 +18,7 @@ from app.schemas.authentication import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=UserRead)
 async def login(
     response: Response,
     service: AuthServiceDep,
@@ -35,7 +35,7 @@ async def login(
         httponly=True,
     )
 
-    return tokens
+    return tokens.user
 
 
 @router.get("/me", response_model=UserRead)

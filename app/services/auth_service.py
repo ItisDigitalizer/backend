@@ -27,6 +27,7 @@ from app.schemas.authentication import (
     ResetPasswordRequest,
     TokenPayload,
     TokenResponse,
+    TokenUserResponse,
 )
 from app.schemas.user import UserFilters
 from app.services.base import BaseService
@@ -98,9 +99,10 @@ class AuthService(BaseService[User, UserRepository]):
             )
         )
 
-        return TokenResponse(
+        return TokenUserResponse(
             access_token=access_token,
             refresh_token=refresh_token,
+            user=user,
         )
 
     async def verify_account(self, token: str):
