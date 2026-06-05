@@ -16,7 +16,7 @@ from app.dependencies import (
 )
 from app.models import User
 from app.models.generation_process import GenerationProcessCreate
-from app.schemas.generation import GenerateResponse
+from app.schemas.generation import GenerateResponse, ManualDataRequest
 
 router = APIRouter(prefix="/generate", tags=["generation"])
 
@@ -64,6 +64,42 @@ async def generate_from_excel(
         process_id=str(process.id),
         download=f"/generate/download/{process.id}/",
         files=len(data_list),
+    )
+
+
+@router.post("/manual/", status_code=201)
+async def generate_manual(
+    template_service: DocumentTemplateServiceDep,
+    generator: DocumentGeneratorServiceDep,
+    process_service: GenerationProcessServiceDep,
+    doc_service: GeneratedDocumentServiceDep,
+    request: ManualDataRequest,
+    template_id: UUID = Form(...),
+    current_user: User = Depends(get_current_user),
+):
+    """Ручное заполнение — один документ"""
+
+    # 1. Проверяем шаблон
+    template = await template_service.get(template_id)
+    if not template or not template.file_path:
+        raise HTTPException(404, "Шаблон не найден")
+
+    # 2. Создаём процесс
+    process = await process_service.create_process(GenerationProcessCreate(user_id=current_user.id, template_id=template_id))
+
+    # 3. Генерируем документ (один словарь → список из одного)
+    data_list = [request.data]
+    result_path = await generator.generate_documents(
+        doc_service,
+        template.file_path,
+        data_list,
+        str(process.id),
+    )
+    logger.info(f"Создали документы {result_path} для процесса {process.id}")
+    return GenerateResponse(
+        process_id=str(process.id),
+        download=f"/generate/download/{process.id}/",
+        files=1,
     )
 
 
