@@ -33,6 +33,9 @@ async def login(
         key="refresh_token",
         value=tokens.refresh_token,
         httponly=True,
+        same_site="lax",
+        secure=False,  # TODO: True in production with HTTPS
+        path="/",
     )
 
     return tokens
