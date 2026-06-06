@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, List
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
+from app.models.document_template import DocumentTemplateRead
 
 if TYPE_CHECKING:
     from app.models.document_template import DocumentTemplate
@@ -34,4 +35,4 @@ class GenerationProcessUpdate(SQLModel):
 
 
 class GenerationProcessRead(GenerationProcessBase, BaseModel):
-    pass
+    template: DocumentTemplateRead | None = None
