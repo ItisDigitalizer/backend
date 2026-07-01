@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
+from fastapi.responses import FileResponse
 
 from app.dependencies import DocumentGeneratorServiceDep, GeneratedDocumentServiceDep
 from app.models.generated_document import (
@@ -12,7 +13,6 @@ from app.models.generated_document import (
 )
 from app.schemas.generated_document import GeneratedDocumentFilters
 from app.schemas.pagination import PaginationParam
-from app.schemas.pdf_response import PdfResponse
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -54,7 +54,7 @@ async def get_pdf_document(
 
     pdf_path = gen_service.convert_to_pdf_sync(doc.file_path)
 
-    return PdfResponse(pdf_path=pdf_path)
+    return FileResponse(path=pdf_path, media_type="application/pdf", headers={"Content-Disposition": "inline"})
 
 
 @router.get("/{document_id}", response_model=GeneratedDocumentRead)

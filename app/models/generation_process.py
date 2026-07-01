@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, List
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
+from app.models.document_template import DocumentTemplateRead
 
 if TYPE_CHECKING:
     from app.models.document_template import DocumentTemplate
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class GenerationProcessBase(SQLModel):
-    user_id: uuid.UUID = Field(foreign_key="users.id")
+    user_id: uuid.UUID | None = Field(foreign_key="users.id", nullable=True)
     template_id: uuid.UUID = Field(foreign_key="document_templates.id")
 
 
@@ -25,7 +26,7 @@ class GenerationProcess(BaseModel, GenerationProcessBase, table=True):
 
 
 class GenerationProcessCreate(GenerationProcessBase):
-    pass
+    user_id: uuid.UUID | None
 
 
 class GenerationProcessUpdate(SQLModel):
@@ -34,4 +35,4 @@ class GenerationProcessUpdate(SQLModel):
 
 
 class GenerationProcessRead(GenerationProcessBase, BaseModel):
-    pass
+    template: DocumentTemplateRead | None = None

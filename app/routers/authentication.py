@@ -33,6 +33,9 @@ async def login(
         key="refresh_token",
         value=tokens.refresh_token,
         httponly=True,
+        samesite="lax",
+        secure=False,  # TODO: True in production with HTTPS
+        path="/",
     )
 
     return tokens
@@ -105,6 +108,9 @@ async def refresh(
         key="refresh_token",
         value=tokens.refresh_token,
         httponly=True,
+        samesite="lax",
+        secure=False,  # TODO: True in production with HTTPS
+        path="/",
     )
 
     return tokens

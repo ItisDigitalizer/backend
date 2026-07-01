@@ -51,7 +51,7 @@ async def get_processes(
     # Если же есть роль менеджера, то ничего дополнительно не делаем,
     # потому что он может смотреть любые процессы
 
-    return await service.get_filtered_process(
+    return await service.get_filtered_process_with_template(
         filters,
         pagination.offset,
         pagination.limit,
@@ -61,11 +61,11 @@ async def get_processes(
 @router.get("/{process_id}", response_model=GenerationProcessRead)
 async def get_process(
     process_id: UUID,
-    service: GenerationProcessServiceDep,
+    gen_proc_service: GenerationProcessServiceDep,
     current_user: User = Depends(get_current_user),
 ):
     """Получение процесса по ID с проверкой прав"""
-    process = await service.get(process_id)
+    process = await gen_proc_service.get(process_id)
     if not process:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Process not found")
 

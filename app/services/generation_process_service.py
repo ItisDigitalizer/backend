@@ -44,3 +44,8 @@ class GenerationProcessService(BaseService[GenerationProcess, GenerationProcessR
         self, filters: GenerationProcessFilters, offset: int, limit: int
     ) -> Sequence[GenerationProcess]:
         return await self.repository.fetch_with_filters(filters, offset, limit)
+
+    async def get_filtered_process_with_template(
+        self, filters: GenerationProcessFilters, offset: int, limit: int
+    ) -> Sequence[GenerationProcess]:
+        return await self.repository.fetch_with_template(filters, offset, limit)
